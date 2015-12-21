@@ -29,7 +29,7 @@ class SerialPortsExtended: SerialPort
     SerialPort ComPort = new SerialPort();
 
     enum charsAfterRXTX : int { None = 0, LineFeed, CarriageReturn, CarriageReturnLineFeed, LineFeedCarriageReturn };
-
+    enum hm1xDeviceType : int { Unknown = 0, HM10 = 1, HM11 = 2, HM15 = 3};
 
 
     // Open port flag.
@@ -38,12 +38,16 @@ class SerialPortsExtended: SerialPort
     // HM-1X //////////////////////
     private string captureBuffer = "";
     private bool captureStream = false;
-    public enum hm1xCallbackSwitch : int { None = 0, Version = 1 }
+    public enum hm1xCallbackSwitch : int { None = 0, Connected = 1, Version = 2 }
     private static System.Timers.Timer HM1Xtimer;
     hm1xCallbackSwitch waitingOn = 0;
+    hm1xDeviceType hm1xModuleType = 0;
+
 
     // Device characteristics.
+    private bool hm1xConnected = false;
     private int hm1xVersion = 0;
+
 
     // HM-1X END //////////////////
 
@@ -61,6 +65,10 @@ class SerialPortsExtended: SerialPort
     // Callback and event handler for passing serial data to the main object.
     public delegate void HM1Xupdated(object sender, object originator, object value);
     public event HM1Xupdated HM1XupdatedEventHandler;
+
+    // Callback and event handler for passing serial data to the main object.
+    public delegate void SerialSystemUpdate(object sender, string text, int progressBarValue, Color progressBarColor);
+    public event SerialSystemUpdate SerialSystemUpdateEventHandler;
 
     // Received data buffer.
     private string InputData = string.Empty;
@@ -91,6 +99,8 @@ class SerialPortsExtended: SerialPort
     // Open port using string identifiers.
     public void openPort(string port, string baudRate, string dataBits, string stopBits, string parity, string handshaking)
     {
+        
+        SerialSystemUpdateHandler(this, "Trying port " + port + "\n", 0, Color.LimeGreen);
         if (portOpen == false && portList.Count > 0)
         {
             ComPort.PortName = Convert.ToString(port);
@@ -103,9 +113,11 @@ class SerialPortsExtended: SerialPort
             {
                 ComPort.Open();
                 ComPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+                SerialSystemUpdateHandler(this, "Opened port " + port + "\n", 100, Color.LimeGreen);
             }
             catch (UnauthorizedAccessException ex)
             {
+                SerialSystemUpdateHandler(this, "Failed to open port " + port + "\n", 0, Color.Crimson);
                 MessageBox.Show(ex.Message);
             }
             portOpen = true;
@@ -118,12 +130,16 @@ class SerialPortsExtended: SerialPort
 
     public void closePort()
     {
+        SerialSystemUpdateHandler(this, "Closing all ports.\n", 0, Color.LimeGreen);
         try
         {
             ComPort.Close();
             portOpen = false;
+            SerialSystemUpdateHandler(this, "Closing all ports.\n", 100, Color.LimeGreen);
         }
-        catch (UnauthorizedAccessException ex) { MessageBox.Show(ex.Message); }
+        catch (UnauthorizedAccessException ex) { MessageBox.Show(ex.Message);
+            SerialSystemUpdateHandler(this, "Failed to close port(s).\n", 100, Color.Crimson);
+        }
     }
 
     public bool isPortOpen()
@@ -274,14 +290,14 @@ class SerialPortsExtended: SerialPort
         }
     }
 
-    // Read Data.
-    private void HM1XupdatedHandler(object sender, object originator, object value)
+
+
+    private void SerialSystemUpdateHandler(object sender, string text, int progressBarValue, Color progressBarColor)
     {
         try
         {
-            this.HM1XupdatedEventHandler(this, originator, value);
-        }
-        catch (UnauthorizedAccessException ex) { MessageBox.Show(ex.Message); }
+            this.SerialSystemUpdateEventHandler(this, text, progressBarValue, progressBarColor);
+        } catch (UnauthorizedAccessException ex) { MessageBox.Show(ex.Message); }
     }
 
     //Write Data
@@ -292,6 +308,7 @@ class SerialPortsExtended: SerialPort
             if (isPortOpen())
             {
                 ComPort.Write(dataToWrite);
+                Console.WriteLine(dataToWrite);
             } else
             {
                 MessageBox.Show(null, "No open port.", "Port error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -493,6 +510,130 @@ class SerialPortsExtended: SerialPort
 
     ///// HM-1X /////////////////////////////////////////////////////////////////////////////////////
 
+    // 1. Populate combo boxes.
+    // 2. Capture stream.
+    // 3. Send command to module.
+    // 4. Set onWaiting to what command is being waited on.
+    // 5. Set timer.
+    // 6. When timer expires, decide if we got a valid response.
+    // 7. If no valid response was obtained, sned last command.
+    // 8. Repeat 7. until timeout or valid response.
+    // 9. Set appropriate variable based upon response.
+    // 10. Release stream.
+    
+    private void HM1XCallbackSetTimer(int milliseconds)
+    {
+        // Create a timer with a two second interval.
+        HM1Xtimer = new System.Timers.Timer(milliseconds);
+        // Hook up the Elapsed event for the timer. 
+        HM1Xtimer.Elapsed += HM1XCommandCallback;
+        HM1Xtimer.AutoReset = false;
+        HM1Xtimer.Enabled = true;
+    }
+
+    private void HM1XCommandCallback(Object source, EventArgs e)
+    {
+        switch (waitingOn)
+        {
+            case hm1xCallbackSwitch.Version:
+                setVersion();
+                HM1XupdatedHandler(this, waitingOn, hm1xVersion);
+                waitingOn = hm1xCallbackSwitch.None;
+                break;
+            case hm1xCallbackSwitch.Connected:
+                setHM1XConnection();
+                HM1XupdatedHandler(this, waitingOn, hm1xVersion);
+                waitingOn = hm1xCallbackSwitch.None;
+                break;
+        }
+    }
+
+    // Read Data.
+    private void HM1XupdatedHandler(object sender, object originator, object value)
+    {
+        try
+        {
+            this.HM1XupdatedEventHandler(this, originator, value);
+        }
+        catch (UnauthorizedAccessException ex) { MessageBox.Show(ex.Message); }
+    }
+
+    public void setModuleType(int type)
+    { 
+        hm1xModuleType = (hm1xDeviceType)type+1; // Combo box doesn't include an "Unknown" like our enum so add 1.
+    }
+
+
+    public void sendCommandToHM1X(ComboBox commandComboBox, ComboBox settingsComboBox, TextBox sendTextBox, TextBox sysLogTextBox, ProgressBar progressBar)
+    {    
+
+        string finalCommand = "";
+        string command = "";
+        string settings = "";
+        string textBox = "";
+
+        if (commandComboBox.Items.Count > 0)
+        {
+            command = commandComboBox.SelectedItem.ToString();
+        }
+        if (settingsComboBox.Items.Count > 0)
+        {
+            settings = settingsComboBox.SelectedItem.ToString();
+        }
+        if (sendTextBox.Text != "")
+        {
+            textBox = sendTextBox.Text;
+        }
+        
+        if(command != "")
+        {
+            finalCommand += command;
+        }
+        if(settings != "")
+        {
+            finalCommand += settings;
+        }
+        if(textBox != "")
+        {
+            finalCommand += textBox;
+        }
+        if(finalCommand != "")
+        {
+            Console.WriteLine(finalCommand);
+            WriteData(finalCommand);
+        }
+    }
+
+    public void connectToHM1X()
+    {
+        SerialSystemUpdateHandler(this, "Connecting to HM-1X\n", 0, Color.LimeGreen);
+        captureStream = true;
+        WriteData("AT"); // Command to get version info.
+        waitingOn = hm1xCallbackSwitch.Connected;
+        HM1XCallbackSetTimer(200); // Wait half a second for reply.
+        SerialSystemUpdateHandler(this, "", 50, Color.LimeGreen);
+    }
+
+    private void setHM1XConnection()
+    {
+        if (captureBuffer.Contains("OK"))
+        {
+            hm1xConnected = true;
+            captureStream = false;
+            this.DataReceivedEventHandler(this, captureBuffer);
+        }
+        else
+        {
+            hm1xConnected = false;
+            captureStream = false;
+        }
+    }
+
+    public bool getHM1Xconnection()
+    {
+        return hm1xConnected;
+    }
+
     // 1. Check if we have the version information, if so, pass it to the event handler
     // 2. If we don't have it, let's  capture serial stream.
     // 3. Send serial command then wait for response.
@@ -517,10 +658,12 @@ class SerialPortsExtended: SerialPort
     //
     private void findVersion()
     {
+        SerialSystemUpdateHandler(this, "Getting Version", 0, Color.LimeGreen);
         captureStream = true;
         WriteData("AT+VERS?"); // Command to get version info.
         waitingOn = hm1xCallbackSwitch.Version;
-        HM1XCallbackSetTimer(500); // Wait half a second for reply.
+        HM1XCallbackSetTimer(250); // Wait half a second for reply.
+        SerialSystemUpdateHandler(this, "Getting Version", 50, Color.LimeGreen);
     }
 
     private void setVersion()
@@ -537,27 +680,139 @@ class SerialPortsExtended: SerialPort
         captureStream = false;  //
     }
 
-    private void HM1XCallbackSetTimer(int milliseconds)
-    {
-        // Create a timer with a two second interval.
-        HM1Xtimer = new System.Timers.Timer(milliseconds);
-        // Hook up the Elapsed event for the timer. 
-        HM1Xtimer.Elapsed += HM1XCommandCallback;
-        HM1Xtimer.AutoReset = false;
-        HM1Xtimer.Enabled = true;
-    }
 
-    private void HM1XCommandCallback(Object source, EventArgs e)
+    public void addHM1XCommandsToComboBox(ComboBox comboBox, int defaultIndex)
     {
-        switch (waitingOn) {
-
-            case hm1xCallbackSwitch.Version:
-                setVersion();
-                HM1XupdatedHandler(this, waitingOn, hm1xVersion);
-                waitingOn = hm1xCallbackSwitch.None;
-                break;
+        // Fills a referenced combobox with data bits settings.
+        comboBox.Items.Add("AT");
+        comboBox.Items.Add("AT+ADC");
+        comboBox.Items.Add("AT+ADDR");
+        comboBox.Items.Add("AT+ADVI");
+        comboBox.Items.Add("AT+ADTY");
+        comboBox.Items.Add("AT+ANCS");
+        comboBox.Items.Add("AT+ALLO");
+        comboBox.Items.Add("AT+AD");
+        comboBox.Items.Add("AT+BEFC");
+        comboBox.Items.Add("AT+AFTC");
+        comboBox.Items.Add("AT+BATC");
+        comboBox.Items.Add("AT+BATT");
+        comboBox.Items.Add("AT+BIT");
+        comboBox.Items.Add("AT+BAUD");
+        comboBox.Items.Add("AT+COMI");
+        comboBox.Items.Add("AT+COMA");
+        comboBox.Items.Add("AT+COLA");
+        comboBox.Items.Add("AT+COUP");
+        comboBox.Items.Add("AT+CHAR");
+        comboBox.Items.Add("AT+CLEAR");
+        comboBox.Items.Add("AT+CONL");
+        comboBox.Items.Add("AT+CO");
+        comboBox.Items.Add("AT+COL");
+        comboBox.Items.Add("AT+CYC");
+        comboBox.Items.Add("AT+DISC");
+        comboBox.Items.Add("AT+DISI");
+        comboBox.Items.Add("AT+CONN");
+        comboBox.Items.Add("AT+DELO");
+        comboBox.Items.Add("AT+ERASE");
+        comboBox.Items.Add("AT+FLAG");
+        comboBox.Items.Add("AT+FILT");
+        comboBox.Items.Add("AT+FIOW");
+        comboBox.Items.Add("AT+GAIN");
+        comboBox.Items.Add("AT+HELP");
+        comboBox.Items.Add("AT+IMME");
+        comboBox.Items.Add("AT+IBEA");
+        comboBox.Items.Add("AT+BEA0");
+        comboBox.Items.Add("AT+BEA1");
+        comboBox.Items.Add("AT+BEA2");
+        comboBox.Items.Add("AT+BEA3");
+        comboBox.Items.Add("AT+MARJ");
+        comboBox.Items.Add("AT+MINO");
+        comboBox.Items.Add("AT+MEAS");
+        comboBox.Items.Add("AT+MODE");
+        comboBox.Items.Add("AT+NOTI");
+        comboBox.Items.Add("AT+NOTP");
+        comboBox.Items.Add("AT+NAME");
+        comboBox.Items.Add("AT+PCTL");
+        comboBox.Items.Add("AT+PARI");
+        comboBox.Items.Add("AT+PIO");
+        comboBox.Items.Add("AT+PASS");
+        comboBox.Items.Add("AT+PIN");
+        comboBox.Items.Add("AT+POWE");
+        comboBox.Items.Add("AT+PWRM");
+        comboBox.Items.Add("AT+RELI");
+        comboBox.Items.Add("AT+RENEW");
+        comboBox.Items.Add("AT+RESTART");
+        comboBox.Items.Add("AT+ROLE");
+        comboBox.Items.Add("AT+RSSI");
+        comboBox.Items.Add("AT+RADD");
+        comboBox.Items.Add("AT+RAT");
+        comboBox.Items.Add("AT+STOP");
+        comboBox.Items.Add("AT+START");
+        comboBox.Items.Add("AT+SLEEP");
+        comboBox.Items.Add("AT+SAVE");
+        comboBox.Items.Add("AT+SENS");
+        comboBox.Items.Add("AT+SHOW");
+        comboBox.Items.Add("AT+TEHU");
+        comboBox.Items.Add("AT+TEMP");
+        comboBox.Items.Add("AT+TCON");
+        comboBox.Items.Add("AT+TYPE");
+        comboBox.Items.Add("AT+UUID");
+        comboBox.Items.Add("AT+UART");
+        comboBox.Items.Add("AT+VERS");
+        if (defaultIndex > comboBox.Items.Count)
+        {
+            defaultIndex = comboBox.Items.Count;
         }
+        else if (defaultIndex < 0)
+        {
+            defaultIndex = 0;
+        }
+        // Default to 
+        comboBox.SelectedIndex = defaultIndex;
     }
 
+    public void addModuleTypesToComboBox(ComboBox comboBox, int defaultIndex)
+    {
+        comboBox.Items.Add("HM-10");
+        comboBox.Items.Add("HM-11");
+        comboBox.Items.Add("HM-15");
+        comboBox.SelectedIndex = defaultIndex;
+    }
+
+
+
+    public void addHM1XSettingsToComboBox(ComboBox comboBox, string commandName, TextBox sysLogTextBox)
+    {
+        if (hm1xModuleType == hm1xDeviceType.Unknown)
+        {
+            sysLogTextBox.Text = "Please discover module type.";
+        }
+        else
+        {
+            // Fills a referenced combobox with HM1X settings.
+            switch (commandName)
+            {
+                case "AT":
+                    switch (hm1xModuleType)
+                    {
+                        case hm1xDeviceType.HM10:
+                            break;
+                        case hm1xDeviceType.HM11:
+                            break;
+                        case hm1xDeviceType.HM15:
+                            break;
+                    }
+                    break;
+                case "AT+VERS":
+                    comboBox.Items.Add("?");
+                    comboBox.Enabled = true;
+                    comboBox.SelectedIndex = 0;
+                    break;
+
+            }
+        }
+
+        // Default to 
+        // comboBox.SelectedIndex = 0;
+    }
     ///// HM-1X END/////////////////////////////////////////////////////////////////////////////////////
 }

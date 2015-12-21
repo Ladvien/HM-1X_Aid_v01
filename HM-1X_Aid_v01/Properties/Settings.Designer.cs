@@ -130,5 +130,17 @@ namespace HM_1X_Aid_v01.Properties {
                 this["charsAfterTX"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int moduleType {
+            get {
+                return ((int)(this["moduleType"]));
+            }
+            set {
+                this["moduleType"] = value;
+            }
+        }
     }
 }

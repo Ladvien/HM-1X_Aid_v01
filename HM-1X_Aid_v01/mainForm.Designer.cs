@@ -2,10 +2,6 @@
 {
     partial class MainDisplay
     {
-        void setText(string text)
-        {
-            rtbMainDisplay.Text = text;
-        }
 
         /// <summary>
         /// Required designer variable.
@@ -93,6 +89,14 @@
             this.cmbCharAfterRx = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.tabHM1XSettings = new System.Windows.Forms.TabPage();
+            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
+            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.cmbHM1XCommands = new System.Windows.Forms.ComboBox();
+            this.cmbHM1XSettings = new System.Windows.Forms.ComboBox();
+            this.btnConfirmHM1XSetting = new System.Windows.Forms.Button();
+            this.lblHM1XSettingInfo = new System.Windows.Forms.Label();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.btnSend = new System.Windows.Forms.Button();
             this.txbSendTextBox = new System.Windows.Forms.TextBox();
@@ -101,22 +105,17 @@
             this.rtbMainDisplay = new System.Windows.Forms.RichTextBox();
             this.menuPanel = new System.Windows.Forms.Panel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.btnConnectHM1X = new System.Windows.Forms.Button();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.lblHM1XConnectionStatus = new System.Windows.Forms.Label();
             this.btnConnect = new System.Windows.Forms.Button();
             this.lblConnectionStatus = new System.Windows.Forms.Label();
             this.txbSysMsg = new System.Windows.Forms.TextBox();
             this.btmClearMainDisplay = new System.Windows.Forms.Button();
-            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.lblHM1XSettingInfo = new System.Windows.Forms.Label();
-            this.btnConfirmHM1XSetting = new System.Windows.Forms.Button();
-            this.lblHM1XConnectionStatus = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
-            this.btnConnectHM1X = new System.Windows.Forms.Button();
+            this.pbSysStatus = new System.Windows.Forms.ProgressBar();
+            this.cmbHM1XDeviceType = new System.Windows.Forms.ComboBox();
+            this.btnClearSettings = new System.Windows.Forms.Button();
             this.mnuMainMenu.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.tbcPortSettings.SuspendLayout();
@@ -125,11 +124,11 @@
             this.tabDataSettings.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.tabHM1XSettings.SuspendLayout();
+            this.tableLayoutPanel5.SuspendLayout();
+            this.tableLayoutPanel6.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.menuPanel.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
-            this.tableLayoutPanel5.SuspendLayout();
-            this.tableLayoutPanel6.SuspendLayout();
             this.SuspendLayout();
             // 
             // contextMenuStrip1
@@ -726,6 +725,107 @@
             this.tabHM1XSettings.Text = "HM-1X Settings";
             this.tabHM1XSettings.UseVisualStyleBackColor = true;
             // 
+            // tableLayoutPanel5
+            // 
+            this.tableLayoutPanel5.ColumnCount = 2;
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 64.71204F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35.28796F));
+            this.tableLayoutPanel5.Controls.Add(this.tableLayoutPanel6, 0, 0);
+            this.tableLayoutPanel5.Controls.Add(this.lblHM1XSettingInfo, 1, 0);
+            this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel5.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
+            this.tableLayoutPanel5.RowCount = 1;
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 168F));
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(955, 168);
+            this.tableLayoutPanel5.TabIndex = 0;
+            // 
+            // tableLayoutPanel6
+            // 
+            this.tableLayoutPanel6.ColumnCount = 2;
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35.94771F));
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 64.05229F));
+            this.tableLayoutPanel6.Controls.Add(this.label9, 0, 0);
+            this.tableLayoutPanel6.Controls.Add(this.label10, 0, 1);
+            this.tableLayoutPanel6.Controls.Add(this.cmbHM1XCommands, 1, 0);
+            this.tableLayoutPanel6.Controls.Add(this.cmbHM1XSettings, 1, 1);
+            this.tableLayoutPanel6.Controls.Add(this.btnConfirmHM1XSetting, 1, 2);
+            this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel6.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel6.Name = "tableLayoutPanel6";
+            this.tableLayoutPanel6.RowCount = 4;
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 62F));
+            this.tableLayoutPanel6.Size = new System.Drawing.Size(612, 162);
+            this.tableLayoutPanel6.TabIndex = 0;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label9.Location = new System.Drawing.Point(3, 0);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(213, 33);
+            this.label9.TabIndex = 0;
+            this.label9.Text = "HM-1X Command";
+            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label10
+            // 
+            this.label10.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label10.Location = new System.Drawing.Point(3, 33);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(213, 33);
+            this.label10.TabIndex = 0;
+            this.label10.Text = "Setting";
+            this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // cmbHM1XCommands
+            // 
+            this.cmbHM1XCommands.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cmbHM1XCommands.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbHM1XCommands.Enabled = false;
+            this.cmbHM1XCommands.FormattingEnabled = true;
+            this.cmbHM1XCommands.Location = new System.Drawing.Point(222, 3);
+            this.cmbHM1XCommands.Name = "cmbHM1XCommands";
+            this.cmbHM1XCommands.Size = new System.Drawing.Size(387, 28);
+            this.cmbHM1XCommands.TabIndex = 1;
+            // 
+            // cmbHM1XSettings
+            // 
+            this.cmbHM1XSettings.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cmbHM1XSettings.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbHM1XSettings.Enabled = false;
+            this.cmbHM1XSettings.FormattingEnabled = true;
+            this.cmbHM1XSettings.Location = new System.Drawing.Point(222, 36);
+            this.cmbHM1XSettings.Name = "cmbHM1XSettings";
+            this.cmbHM1XSettings.Size = new System.Drawing.Size(387, 28);
+            this.cmbHM1XSettings.TabIndex = 2;
+            // 
+            // btnConfirmHM1XSetting
+            // 
+            this.btnConfirmHM1XSetting.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnConfirmHM1XSetting.Enabled = false;
+            this.btnConfirmHM1XSetting.Location = new System.Drawing.Point(222, 69);
+            this.btnConfirmHM1XSetting.Name = "btnConfirmHM1XSetting";
+            this.btnConfirmHM1XSetting.Size = new System.Drawing.Size(387, 27);
+            this.btnConfirmHM1XSetting.TabIndex = 3;
+            this.btnConfirmHM1XSetting.Text = "Confirm";
+            this.btnConfirmHM1XSetting.UseVisualStyleBackColor = true;
+            this.btnConfirmHM1XSetting.Click += new System.EventHandler(this.btnConfirmHM1XSetting_Click);
+            // 
+            // lblHM1XSettingInfo
+            // 
+            this.lblHM1XSettingInfo.AutoSize = true;
+            this.lblHM1XSettingInfo.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblHM1XSettingInfo.Location = new System.Drawing.Point(621, 0);
+            this.lblHM1XSettingInfo.Name = "lblHM1XSettingInfo";
+            this.lblHM1XSettingInfo.Size = new System.Drawing.Size(331, 168);
+            this.lblHM1XSettingInfo.TabIndex = 1;
+            // 
             // tableLayoutPanel4
             // 
             this.tableLayoutPanel4.ColumnCount = 5;
@@ -830,6 +930,9 @@
             this.tableLayoutPanel2.Controls.Add(this.lblConnectionStatus, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.txbSysMsg, 0, 11);
             this.tableLayoutPanel2.Controls.Add(this.btmClearMainDisplay, 0, 3);
+            this.tableLayoutPanel2.Controls.Add(this.pbSysStatus, 0, 10);
+            this.tableLayoutPanel2.Controls.Add(this.cmbHM1XDeviceType, 0, 7);
+            this.tableLayoutPanel2.Controls.Add(this.btnClearSettings, 0, 8);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(20, 20);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -849,6 +952,57 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel2.Size = new System.Drawing.Size(160, 631);
             this.tableLayoutPanel2.TabIndex = 2;
+            // 
+            // btnConnectHM1X
+            // 
+            this.btnConnectHM1X.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnConnectHM1X.Enabled = false;
+            this.btnConnectHM1X.Location = new System.Drawing.Point(3, 255);
+            this.btnConnectHM1X.Name = "btnConnectHM1X";
+            this.btnConnectHM1X.Size = new System.Drawing.Size(154, 36);
+            this.btnConnectHM1X.TabIndex = 10;
+            this.btnConnectHM1X.Text = "Connect";
+            this.btnConnectHM1X.UseVisualStyleBackColor = true;
+            this.btnConnectHM1X.Click += new System.EventHandler(this.btnConnectHM1X_Click);
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.BackColor = System.Drawing.Color.Transparent;
+            this.label13.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label13.Location = new System.Drawing.Point(3, 168);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(154, 42);
+            this.label13.TabIndex = 9;
+            this.label13.Text = "HM-1X";
+            this.label13.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.BackColor = System.Drawing.Color.Transparent;
+            this.label12.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label12.Location = new System.Drawing.Point(3, 0);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(154, 42);
+            this.label12.TabIndex = 8;
+            this.label12.Text = "Serial Port";
+            this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // lblHM1XConnectionStatus
+            // 
+            this.lblHM1XConnectionStatus.AutoSize = true;
+            this.lblHM1XConnectionStatus.BackColor = System.Drawing.Color.Crimson;
+            this.lblHM1XConnectionStatus.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblHM1XConnectionStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblHM1XConnectionStatus.Location = new System.Drawing.Point(3, 210);
+            this.lblHM1XConnectionStatus.Name = "lblHM1XConnectionStatus";
+            this.lblHM1XConnectionStatus.Size = new System.Drawing.Size(154, 42);
+            this.lblHM1XConnectionStatus.TabIndex = 7;
+            this.lblHM1XConnectionStatus.Text = "Disconnected";
+            this.lblHM1XConnectionStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // btnConnect
             // 
@@ -896,156 +1050,36 @@
             this.btmClearMainDisplay.UseVisualStyleBackColor = true;
             this.btmClearMainDisplay.Click += new System.EventHandler(this.btmClearMainDisplay_Click);
             // 
-            // tableLayoutPanel5
+            // pbSysStatus
             // 
-            this.tableLayoutPanel5.ColumnCount = 2;
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 64.71204F));
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35.28796F));
-            this.tableLayoutPanel5.Controls.Add(this.tableLayoutPanel6, 0, 0);
-            this.tableLayoutPanel5.Controls.Add(this.lblHM1XSettingInfo, 1, 0);
-            this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel5.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
-            this.tableLayoutPanel5.RowCount = 1;
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(955, 168);
-            this.tableLayoutPanel5.TabIndex = 0;
+            this.pbSysStatus.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pbSysStatus.Location = new System.Drawing.Point(3, 423);
+            this.pbSysStatus.Name = "pbSysStatus";
+            this.pbSysStatus.Size = new System.Drawing.Size(154, 36);
+            this.pbSysStatus.TabIndex = 11;
             // 
-            // tableLayoutPanel6
+            // cmbHM1XDeviceType
             // 
-            this.tableLayoutPanel6.ColumnCount = 2;
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35.94771F));
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 64.05229F));
-            this.tableLayoutPanel6.Controls.Add(this.label9, 0, 0);
-            this.tableLayoutPanel6.Controls.Add(this.label10, 0, 1);
-            this.tableLayoutPanel6.Controls.Add(this.comboBox1, 1, 0);
-            this.tableLayoutPanel6.Controls.Add(this.comboBox2, 1, 1);
-            this.tableLayoutPanel6.Controls.Add(this.btnConfirmHM1XSetting, 1, 2);
-            this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel6.Location = new System.Drawing.Point(3, 3);
-            this.tableLayoutPanel6.Name = "tableLayoutPanel6";
-            this.tableLayoutPanel6.RowCount = 4;
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 62F));
-            this.tableLayoutPanel6.Size = new System.Drawing.Size(612, 162);
-            this.tableLayoutPanel6.TabIndex = 0;
+            this.cmbHM1XDeviceType.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cmbHM1XDeviceType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbHM1XDeviceType.Enabled = false;
+            this.cmbHM1XDeviceType.FormattingEnabled = true;
+            this.cmbHM1XDeviceType.Location = new System.Drawing.Point(3, 297);
+            this.cmbHM1XDeviceType.Name = "cmbHM1XDeviceType";
+            this.cmbHM1XDeviceType.Size = new System.Drawing.Size(154, 28);
+            this.cmbHM1XDeviceType.TabIndex = 12;
+            this.cmbHM1XDeviceType.SelectedIndexChanged += new System.EventHandler(this.cmbHM1XDeviceType_SelectedIndexChanged);
             // 
-            // label9
+            // btnClearSettings
             // 
-            this.label9.AutoSize = true;
-            this.label9.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label9.Location = new System.Drawing.Point(3, 0);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(213, 33);
-            this.label9.TabIndex = 0;
-            this.label9.Text = "HM-1X Attribute";
-            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // label10
-            // 
-            this.label10.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label10.Location = new System.Drawing.Point(3, 33);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(213, 33);
-            this.label10.TabIndex = 0;
-            this.label10.Text = "Setting";
-            this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.Enabled = false;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(222, 3);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(387, 28);
-            this.comboBox1.TabIndex = 1;
-            // 
-            // comboBox2
-            // 
-            this.comboBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox2.Enabled = false;
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(222, 36);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(387, 28);
-            this.comboBox2.TabIndex = 2;
-            // 
-            // lblHM1XSettingInfo
-            // 
-            this.lblHM1XSettingInfo.AutoSize = true;
-            this.lblHM1XSettingInfo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblHM1XSettingInfo.Location = new System.Drawing.Point(621, 0);
-            this.lblHM1XSettingInfo.Name = "lblHM1XSettingInfo";
-            this.lblHM1XSettingInfo.Size = new System.Drawing.Size(331, 168);
-            this.lblHM1XSettingInfo.TabIndex = 1;
-            // 
-            // btnConfirmHM1XSetting
-            // 
-            this.btnConfirmHM1XSetting.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnConfirmHM1XSetting.Location = new System.Drawing.Point(222, 69);
-            this.btnConfirmHM1XSetting.Name = "btnConfirmHM1XSetting";
-            this.btnConfirmHM1XSetting.Size = new System.Drawing.Size(387, 27);
-            this.btnConfirmHM1XSetting.TabIndex = 3;
-            this.btnConfirmHM1XSetting.Text = "Confirm";
-            this.btnConfirmHM1XSetting.UseVisualStyleBackColor = true;
-            this.btnConfirmHM1XSetting.Click += new System.EventHandler(this.btnConfirmHM1XSetting_Click);
-            // 
-            // lblHM1XConnectionStatus
-            // 
-            this.lblHM1XConnectionStatus.AutoSize = true;
-            this.lblHM1XConnectionStatus.BackColor = System.Drawing.Color.Crimson;
-            this.lblHM1XConnectionStatus.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblHM1XConnectionStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblHM1XConnectionStatus.Location = new System.Drawing.Point(3, 210);
-            this.lblHM1XConnectionStatus.Name = "lblHM1XConnectionStatus";
-            this.lblHM1XConnectionStatus.Size = new System.Drawing.Size(154, 42);
-            this.lblHM1XConnectionStatus.TabIndex = 7;
-            this.lblHM1XConnectionStatus.Text = "Disconnected";
-            this.lblHM1XConnectionStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.BackColor = System.Drawing.Color.Transparent;
-            this.label12.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(3, 0);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(154, 42);
-            this.label12.TabIndex = 8;
-            this.label12.Text = "Serial Port";
-            this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.BackColor = System.Drawing.Color.Transparent;
-            this.label13.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label13.Location = new System.Drawing.Point(3, 168);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(154, 42);
-            this.label13.TabIndex = 9;
-            this.label13.Text = "HM-1X";
-            this.label13.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // btnConnectHM1X
-            // 
-            this.btnConnectHM1X.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnConnectHM1X.Enabled = false;
-            this.btnConnectHM1X.Location = new System.Drawing.Point(3, 255);
-            this.btnConnectHM1X.Name = "btnConnectHM1X";
-            this.btnConnectHM1X.Size = new System.Drawing.Size(154, 36);
-            this.btnConnectHM1X.TabIndex = 10;
-            this.btnConnectHM1X.Text = "Connect";
-            this.btnConnectHM1X.UseVisualStyleBackColor = true;
-            this.btnConnectHM1X.Click += new System.EventHandler(this.btnConnectHM1X_Click);
+            this.btnClearSettings.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnClearSettings.Location = new System.Drawing.Point(3, 339);
+            this.btnClearSettings.Name = "btnClearSettings";
+            this.btnClearSettings.Size = new System.Drawing.Size(154, 36);
+            this.btnClearSettings.TabIndex = 13;
+            this.btnClearSettings.Text = "Clear Settings";
+            this.btnClearSettings.UseVisualStyleBackColor = true;
+            this.btnClearSettings.Click += new System.EventHandler(this.btnClearSettings_Click);
             // 
             // MainDisplay
             // 
@@ -1070,15 +1104,15 @@
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel3.PerformLayout();
             this.tabHM1XSettings.ResumeLayout(false);
+            this.tableLayoutPanel5.ResumeLayout(false);
+            this.tableLayoutPanel5.PerformLayout();
+            this.tableLayoutPanel6.ResumeLayout(false);
+            this.tableLayoutPanel6.PerformLayout();
             this.tableLayoutPanel4.ResumeLayout(false);
             this.tableLayoutPanel4.PerformLayout();
             this.menuPanel.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
-            this.tableLayoutPanel5.ResumeLayout(false);
-            this.tableLayoutPanel5.PerformLayout();
-            this.tableLayoutPanel6.ResumeLayout(false);
-            this.tableLayoutPanel6.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1159,14 +1193,17 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.ComboBox comboBox2;
+        private System.Windows.Forms.ComboBox cmbHM1XCommands;
+        private System.Windows.Forms.ComboBox cmbHM1XSettings;
         private System.Windows.Forms.Label lblHM1XSettingInfo;
         private System.Windows.Forms.Button btnConfirmHM1XSetting;
         private System.Windows.Forms.Button btnConnectHM1X;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label lblHM1XConnectionStatus;
+        private System.Windows.Forms.ProgressBar pbSysStatus;
+        private System.Windows.Forms.ComboBox cmbHM1XDeviceType;
+        private System.Windows.Forms.Button btnClearSettings;
     }
 
 
