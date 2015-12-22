@@ -32,15 +32,28 @@ class SerialPortsExtended: SerialPort
     enum hm1xDeviceType : int { Unknown = 0, HM10 = 1, HM11 = 2, HM15 = 3};
 
 
+
+    Dictionary<hm1xDeviceType, string> HM1XCommandEnumLookUp = new Dictionary<hm1xDeviceType, string>();
+
     // Open port flag.
     private bool portOpen = false;
 
     // HM-1X //////////////////////
     private string captureBuffer = "";
     private bool captureStream = false;
-    public enum hm1xCallbackSwitch : int { None = 0, Connected = 1, Version = 2 }
+
+    string[] hm1xCommandsString = {"None", "AT", "AT+ADC", "AT+ADDR","AT+ADVI","AT+ADTY","AT+ANCS","AT+ALLO","AT+AD","AT+BEFC","AT+AFTC","AT+BATC","AT+BATT",
+                                   "AT+BIT","AT+BAUD","AT+COMI","AT+COMA","AT+COLA","AT+COUP","AT+CHAR", "AT+CLEAR","AT+CONL","AT+CO","AT+COL",
+                                   "AT+CYC", "AT+DISC", "AT+DISI", "AT+CONN", "AT+DELO", "AT+ERASE", "AT+FLAG", "AT+FILT", "AT+FIOW", "AT+GAIN",
+                                   "AT+HELP", "AT+IMME", "AT+IBEA", "AT+BEA0", "AT+BEA1", "AT+BEA2", "AT+BEA3", "AT+MARJ", "AT+MINO", "AT+MEAS",
+                                   "AT+MODE", "AT+NOTI", "AT+NOTP", "AT+NAME", "AT+PCTL", "AT+PARI", "AT+PIO", "AT+PASS", "AT+PIN", "AT+POWE",
+                                   "AT+PWRM", "AT+RELI", "AT+RENEW", "AT+RESTART", "AT+ROLE", "AT+RSSI", "AT+RADD", "AT+RAT", "AT+STOP", "AT+START",
+                                   "AT+SLEEP", "AT+SAVE", "AT+SENS", "AT+SHOW", "AT+TEHU", "AT+TEMP", "AT+TCON", "AT+TYPE", "AT+UUID", "AT+UART","AT+VERS" };
+
+    public enum hm1xEnumCommands : int { None = 0, CheckStatus, ADC,  }
+
     private static System.Timers.Timer HM1Xtimer;
-    hm1xCallbackSwitch waitingOn = 0;
+    hm1xEnumCommands waitingOn = 0;
     hm1xDeviceType hm1xModuleType = 0;
 
 
@@ -515,7 +528,8 @@ class SerialPortsExtended: SerialPort
     // 3. Send command to module.
     // 4. Set onWaiting to what command is being waited on.
     // 5. Set timer.
-    // 6. When timer expires, decide if we got a valid response.
+    // 6. When HM1X sends response analyze it for validity.
+    //    OR when timer expires, decide if we got a valid response.
     // 7. If no valid response was obtained, sned last command.
     // 8. Repeat 7. until timeout or valid response.
     // 9. Set appropriate variable based upon response.
@@ -535,15 +549,15 @@ class SerialPortsExtended: SerialPort
     {
         switch (waitingOn)
         {
-            case hm1xCallbackSwitch.Version:
+            case hm1xEnumCommands.Version:
                 setVersion();
                 HM1XupdatedHandler(this, waitingOn, hm1xVersion);
-                waitingOn = hm1xCallbackSwitch.None;
+                waitingOn = hm1xEnumCommands.None;
                 break;
-            case hm1xCallbackSwitch.Connected:
+            case hm1xEnumCommands.Connected:
                 setHM1XConnection();
-                HM1XupdatedHandler(this, waitingOn, hm1xVersion);
-                waitingOn = hm1xCallbackSwitch.None;
+                HM1XupdatedHandler(this, waitingOn, hm1xConnected);
+                waitingOn = hm1xEnumCommands.None;
                 break;
         }
     }
@@ -560,7 +574,7 @@ class SerialPortsExtended: SerialPort
 
     public void setModuleType(int type)
     { 
-        hm1xModuleType = (hm1xDeviceType)type+1; // Combo box doesn't include an "Unknown" like our enum so add 1.
+        hm1xModuleType = (hm1xDeviceType)type; 
     }
 
 
@@ -597,6 +611,7 @@ class SerialPortsExtended: SerialPort
         {
             finalCommand += textBox;
         }
+
         if(finalCommand != "")
         {
             Console.WriteLine(finalCommand);
@@ -609,7 +624,7 @@ class SerialPortsExtended: SerialPort
         SerialSystemUpdateHandler(this, "Connecting to HM-1X\n", 0, Color.LimeGreen);
         captureStream = true;
         WriteData("AT"); // Command to get version info.
-        waitingOn = hm1xCallbackSwitch.Connected;
+        waitingOn = hm1xEnumCommands.Connected;
         HM1XCallbackSetTimer(200); // Wait half a second for reply.
         SerialSystemUpdateHandler(this, "", 50, Color.LimeGreen);
     }
@@ -648,7 +663,7 @@ class SerialPortsExtended: SerialPort
         {
             try
             {
-                this.HM1XupdatedEventHandler(this, hm1xCallbackSwitch.Version, hm1xVersion);
+                this.HM1XupdatedEventHandler(this, hm1xEnumCommands.Version, hm1xVersion);
             }
             catch (UnauthorizedAccessException ex) { MessageBox.Show(ex.Message); }
         }
@@ -661,7 +676,7 @@ class SerialPortsExtended: SerialPort
         SerialSystemUpdateHandler(this, "Getting Version", 0, Color.LimeGreen);
         captureStream = true;
         WriteData("AT+VERS?"); // Command to get version info.
-        waitingOn = hm1xCallbackSwitch.Version;
+        waitingOn = hm1xEnumCommands.Version;
         HM1XCallbackSetTimer(250); // Wait half a second for reply.
         SerialSystemUpdateHandler(this, "Getting Version", 50, Color.LimeGreen);
     }
@@ -772,6 +787,7 @@ class SerialPortsExtended: SerialPort
 
     public void addModuleTypesToComboBox(ComboBox comboBox, int defaultIndex)
     {
+        comboBox.Items.Add("Unknown");
         comboBox.Items.Add("HM-10");
         comboBox.Items.Add("HM-11");
         comboBox.Items.Add("HM-15");

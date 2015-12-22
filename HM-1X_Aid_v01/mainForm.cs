@@ -119,26 +119,28 @@ namespace HM_1X_Aid_v01
             this.BeginInvoke(new SetTextCallback(SetText), new object[] { tempBuffer });
         }
 
+        // HM1XupdateValue is on the serialPorts thread, so it simply passes its load to updateHM1XVariables on the main.S
+        public void HM1XupdateValue(object sender, object originator, object value)
+        {
+            this.BeginInvoke(new HM1XVariableUpdate(updateHM1XVariables), new object[] { sender, originator, value });
+        }
+
         public void updateHM1XVariables(object sender, object originator, object value)
         {
-            SerialPortsExtended.hm1xCallbackSwitch switchValue = (SerialPortsExtended.hm1xCallbackSwitch)originator;
+            SerialPortsExtended.hm1xEnumCommands switchValue = (SerialPortsExtended.hm1xEnumCommands)originator;
             switch (switchValue)
             {
-                case SerialPortsExtended.hm1xCallbackSwitch.Connected:
+                case SerialPortsExtended.hm1xEnumCommands.Connected:
                     lblHM1XConnectionStatus.Text = "Connected";
                     lblHM1XConnectionStatus.BackColor = Color.LimeGreen;
                     serialSystemUpdate(this, "HM-1X said '" + tempBuffer + "'", 100, Color.LimeGreen);
                     break;
-                case SerialPortsExtended.hm1xCallbackSwitch.Version:
+                case SerialPortsExtended.hm1xEnumCommands.Version:
                     serialSystemUpdate(this, "Firmware V" + serialPorts.getVersion().ToString(), 100, Color.LimeGreen);
                     break;
             }
         }
 
-        public void HM1XupdateValue(object sender, object originator, object value)
-        {
-            this.BeginInvoke(new HM1XVariableUpdate(updateHM1XVariables), new object[] { sender, originator, value });
-        }
 
         public void serialSystemUpdate(object sender, string text, int progressBarValue, Color progressBarColor)
         {
