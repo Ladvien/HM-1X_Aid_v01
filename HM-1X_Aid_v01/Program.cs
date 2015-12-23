@@ -50,7 +50,15 @@ class SerialPortsExtended: SerialPort
                                    "AT+PWRM", "AT+RELI", "AT+RENEW", "AT+RESTART", "AT+ROLE", "AT+RSSI", "AT+RADD", "AT+RAT", "AT+STOP", "AT+START",
                                    "AT+SLEEP", "AT+SAVE", "AT+SENS", "AT+SHOW", "AT+TEHU", "AT+TEMP", "AT+TCON", "AT+TYPE", "AT+UUID", "AT+UART","AT+VERS" };
 
-    public enum hm1xEnumCommands : int { None = 0, CheckStatus, ADC,  }
+    public enum hm1xEnumCommands : int { None = 0, CheckStatus, ADC, MACAddress, AdvertizingInterval, AdvertizingType, ANCS, Whitelist, WhitelistMACAddress, PIOStateAfterPowerOn, PIOStateAfterConnection,
+                                         BatteryMonitor, BatteryInformation, BitFormat, BaudRate, MinLinkLayerInterval, MaxLinkLayerInterval, LinkLayerSlaveLatency, UpdateConnectionParameter, Characteristic,
+                                         ClearLastConnected, TryLastConnected, TryConnectionAddress, PIOState, PIOCollectionRate, StartDiscovery, StartiBeaconDiscovery, ConnectToDiscoveredDevice, iBeaconMode, RemoveBondInfo,
+                                         AdvertizingFlag, HM1XConnectionFilter,  FlowControlSwitch, RXGain, Help, WorkType, iBeaconModeSwitch, iBeaconUUID0, iBeaconUUID1, iBeaconUUID2, IbeaconUUID3,
+                                         iBeaconMajorVersion, iBeaconMinorVersion, iBeaconMeasuredPower,WorkMode, ConnectionNotification, ConnNotificationMode, Name, OutputDriver, Parity, ConnectionLEDMode, SetPIOTemp, Pin,
+                                         PowerLevel, SleepType, ReliableAdvertizing, Renew, Reset, Role, RSSI, LastConnectedAddress, SensorWorkInterval,StopBits, StartWork, Sleep, SaveConnectedAddress, SensorType,
+                                         DiscoveryParameter, TemperatureSensor, ICTemperature, RemoteDeviceTimeout, BondType, Service, WakeThroughUART, Version, }
+
+    Dictionary<string, hm1xEnumCommands> hm1xCommandsDict = new Dictionary<string, hm1xEnumCommands>();
 
     private static System.Timers.Timer HM1Xtimer;
     hm1xEnumCommands waitingOn = 0;
@@ -86,6 +94,18 @@ class SerialPortsExtended: SerialPort
     // Received data buffer.
     private string InputData = string.Empty;
 
+
+    public void initDictionary()
+    {
+        int index = 0;
+        foreach (hm1xEnumCommands commands in Enum.GetValues(typeof(hm1xEnumCommands)))
+        {
+            hm1xCommandsDict.Add(hm1xCommandsString[index], commands);
+            Console.WriteLine("Value: {0}     key:{1}     index: {2}", hm1xCommandsDict[hm1xCommandsString[index]], hm1xCommandsString[index], index);
+            index++;
+        }
+    }
+
     // Setters for the timeouts.
     public void setReadTimeout(int timeout)
     {
@@ -112,7 +132,8 @@ class SerialPortsExtended: SerialPort
     // Open port using string identifiers.
     public void openPort(string port, string baudRate, string dataBits, string stopBits, string parity, string handshaking)
     {
-        
+        Console.WriteLine(hm1xCommandsDict);
+ 
         SerialSystemUpdateHandler(this, "Trying port " + port + "\n", 0, Color.LimeGreen);
         if (portOpen == false && portList.Count > 0)
         {
@@ -554,7 +575,7 @@ class SerialPortsExtended: SerialPort
                 HM1XupdatedHandler(this, waitingOn, hm1xVersion);
                 waitingOn = hm1xEnumCommands.None;
                 break;
-            case hm1xEnumCommands.Connected:
+            case hm1xEnumCommands.CheckStatus:
                 setHM1XConnection();
                 HM1XupdatedHandler(this, waitingOn, hm1xConnected);
                 waitingOn = hm1xEnumCommands.None;
@@ -624,7 +645,7 @@ class SerialPortsExtended: SerialPort
         SerialSystemUpdateHandler(this, "Connecting to HM-1X\n", 0, Color.LimeGreen);
         captureStream = true;
         WriteData("AT"); // Command to get version info.
-        waitingOn = hm1xEnumCommands.Connected;
+        waitingOn = hm1xEnumCommands.CheckStatus;
         HM1XCallbackSetTimer(200); // Wait half a second for reply.
         SerialSystemUpdateHandler(this, "", 50, Color.LimeGreen);
     }

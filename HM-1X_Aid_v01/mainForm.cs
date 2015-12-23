@@ -36,6 +36,9 @@ namespace HM_1X_Aid_v01
             // Prevents the GUI from getting illegible.
             this.MinimumSize = new System.Drawing.Size(800, 600);
 
+            // Initialize the HM1X dictionary.
+            serialPorts.initDictionary();
+
             serialPorts.addModuleTypesToComboBox(cmbHM1XDeviceType, 0);
             // Populate COM info.
             loadCOMInfo();
@@ -130,7 +133,7 @@ namespace HM_1X_Aid_v01
             SerialPortsExtended.hm1xEnumCommands switchValue = (SerialPortsExtended.hm1xEnumCommands)originator;
             switch (switchValue)
             {
-                case SerialPortsExtended.hm1xEnumCommands.Connected:
+                case SerialPortsExtended.hm1xEnumCommands.CheckStatus:
                     lblHM1XConnectionStatus.Text = "Connected";
                     lblHM1XConnectionStatus.BackColor = Color.LimeGreen;
                     serialSystemUpdate(this, "HM-1X said '" + tempBuffer + "'", 100, Color.LimeGreen);
