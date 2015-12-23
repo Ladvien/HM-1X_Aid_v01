@@ -136,10 +136,7 @@ namespace HM_1X_Aid_v01
                 case SerialPortsExtended.hm1xEnumCommands.CheckStatus:
                     lblHM1XConnectionStatus.Text = "Connected";
                     lblHM1XConnectionStatus.BackColor = Color.LimeGreen;
-                    serialSystemUpdate(this, "HM-1X said '" + tempBuffer + "'", 100, Color.LimeGreen);
-                    break;
-                case SerialPortsExtended.hm1xEnumCommands.Version:
-                    serialSystemUpdate(this, "Firmware V" + serialPorts.getVersion().ToString(), 100, Color.LimeGreen);
+                    serialSystemUpdate(this, "HM-1X said '" + tempBuffer + "'\n", 100, Color.LimeGreen);
                     break;
             }
         }

@@ -20,6 +20,7 @@ namespace HM_1X_Aid_v01
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainDisplay());        
         }        
+        
     }
 }
 
@@ -56,7 +57,9 @@ class SerialPortsExtended: SerialPort
                                          AdvertizingFlag, HM1XConnectionFilter,  FlowControlSwitch, RXGain, Help, WorkType, iBeaconModeSwitch, iBeaconUUID0, iBeaconUUID1, iBeaconUUID2, IbeaconUUID3,
                                          iBeaconMajorVersion, iBeaconMinorVersion, iBeaconMeasuredPower,WorkMode, ConnectionNotification, ConnNotificationMode, Name, OutputDriver, Parity, ConnectionLEDMode, SetPIOTemp, Pin,
                                          PowerLevel, SleepType, ReliableAdvertizing, Renew, Reset, Role, RSSI, LastConnectedAddress, SensorWorkInterval,StopBits, StartWork, Sleep, SaveConnectedAddress, SensorType,
-                                         DiscoveryParameter, TemperatureSensor, ICTemperature, RemoteDeviceTimeout, BondType, Service, WakeThroughUART, Version, }
+                                         DiscoveryParameter, TemperatureSensor, ICTemperature, RemoteDeviceTimeout, BondType, Service, WakeThroughUART, Version}
+
+    string[] hm1xCommandsExplained = { };
 
     Dictionary<string, hm1xEnumCommands> hm1xCommandsDict = new Dictionary<string, hm1xEnumCommands>();
 
@@ -71,6 +74,8 @@ class SerialPortsExtended: SerialPort
 
 
     // HM-1X END //////////////////
+
+    delegate void HM1XVariableUpdate(object sender, object originator, object value);
 
     // List containing all discovered COMs.
     List<String> portList = new List<String>();
@@ -97,11 +102,11 @@ class SerialPortsExtended: SerialPort
 
     public void initDictionary()
     {
+        HM1XupdatedEventHandler += new SerialPortsExtended.HM1Xupdated(HM1XupdateValue);
         int index = 0;
         foreach (hm1xEnumCommands commands in Enum.GetValues(typeof(hm1xEnumCommands)))
         {
             hm1xCommandsDict.Add(hm1xCommandsString[index], commands);
-            Console.WriteLine("Value: {0}     key:{1}     index: {2}", hm1xCommandsDict[hm1xCommandsString[index]], hm1xCommandsString[index], index);
             index++;
         }
     }
@@ -570,6 +575,9 @@ class SerialPortsExtended: SerialPort
     {
         switch (waitingOn)
         {
+            case hm1xEnumCommands.None:
+                HM1XupdatedHandler(this, waitingOn, hm1xVersion);
+                break;
             case hm1xEnumCommands.Version:
                 setVersion();
                 HM1XupdatedHandler(this, waitingOn, hm1xVersion);
@@ -586,11 +594,29 @@ class SerialPortsExtended: SerialPort
     // Read Data.
     private void HM1XupdatedHandler(object sender, object originator, object value)
     {
+        this.BeginInvoke(new SetTextCallback(SetText), new object[] { tempBuffer });
         try
         {
             this.HM1XupdatedEventHandler(this, originator, value);
-        }
+        } 
         catch (UnauthorizedAccessException ex) { MessageBox.Show(ex.Message); }
+    }
+
+    private void HM1XupdateValue(object sender, object originator, object value)
+    {
+        SerialPortsExtended.hm1xEnumCommands switchValue = (SerialPortsExtended.hm1xEnumCommands)originator;
+        switch (switchValue)
+        {
+            case SerialPortsExtended.hm1xEnumCommands.None:
+                //SerialSystemUpdateHandler(this, "Error" + SerialPortsExtended.hm1xEnumCommands.Version.ToString(), 100, Color.Crimson);
+                break;
+            case SerialPortsExtended.hm1xEnumCommands.CheckStatus:
+                // ADD LATER.
+                break;
+            case SerialPortsExtended.hm1xEnumCommands.Version:
+              //  SerialSystemUpdateHandler(this, "Completed " + SerialPortsExtended.hm1xEnumCommands.Version.ToString(), 100, Color.LimeGreen);
+                break;
+        }
     }
 
     public void setModuleType(int type)
@@ -600,13 +626,14 @@ class SerialPortsExtended: SerialPort
 
 
     public void sendCommandToHM1X(ComboBox commandComboBox, ComboBox settingsComboBox, TextBox sendTextBox, TextBox sysLogTextBox, ProgressBar progressBar)
-    {    
+    {
+        captureStream = true;
 
         string finalCommand = "";
         string command = "";
         string settings = "";
         string textBox = "";
-
+        
         if (commandComboBox.Items.Count > 0)
         {
             command = commandComboBox.SelectedItem.ToString();
@@ -635,9 +662,12 @@ class SerialPortsExtended: SerialPort
 
         if(finalCommand != "")
         {
-            Console.WriteLine(finalCommand);
             WriteData(finalCommand);
         }
+        waitingOn = hm1xCommandsDict[commandComboBox.SelectedItem.ToString()];
+        HM1XCallbackSetTimer(200); // Wait half a second for reply.
+        SerialSystemUpdateHandler(this, "", 50, Color.LimeGreen);
+
     }
 
     public void connectToHM1X()
@@ -655,14 +685,13 @@ class SerialPortsExtended: SerialPort
         if (captureBuffer.Contains("OK"))
         {
             hm1xConnected = true;
-            captureStream = false;
             this.DataReceivedEventHandler(this, captureBuffer);
         }
         else
         {
             hm1xConnected = false;
-            captureStream = false;
         }
+        captureStream = false;
     }
 
     public bool getHM1Xconnection()
@@ -675,32 +704,6 @@ class SerialPortsExtended: SerialPort
     // 3. Send serial command then wait for response.
     // 4. When the response is received, let's parse it and send it to the event handler.
     // 5. Release serial stream.
-    public int getVersion()
-    {
-        if(hm1xVersion < 1)
-        {
-            findVersion();
-        } else
-        {
-            try
-            {
-                this.HM1XupdatedEventHandler(this, hm1xEnumCommands.Version, hm1xVersion);
-            }
-            catch (UnauthorizedAccessException ex) { MessageBox.Show(ex.Message); }
-        }
-        return hm1xVersion;
-    }
-    
-    //
-    private void findVersion()
-    {
-        SerialSystemUpdateHandler(this, "Getting Version", 0, Color.LimeGreen);
-        captureStream = true;
-        WriteData("AT+VERS?"); // Command to get version info.
-        waitingOn = hm1xEnumCommands.Version;
-        HM1XCallbackSetTimer(250); // Wait half a second for reply.
-        SerialSystemUpdateHandler(this, "Getting Version", 50, Color.LimeGreen);
-    }
 
     private void setVersion()
     {
