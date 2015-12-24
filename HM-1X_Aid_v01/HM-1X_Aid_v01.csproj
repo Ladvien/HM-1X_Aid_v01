@@ -73,6 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="hm1xConstants.cs" />
     <Compile Include="mainForm.cs">
       <SubType>Form</SubType>
     </Compile>

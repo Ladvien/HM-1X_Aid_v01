@@ -130,15 +130,8 @@ namespace HM_1X_Aid_v01
 
         public void updateHM1XVariables(object sender, object originator, object value)
         {
-            SerialPortsExtended.hm1xEnumCommands switchValue = (SerialPortsExtended.hm1xEnumCommands)originator;
-            switch (switchValue)
-            {
-                case SerialPortsExtended.hm1xEnumCommands.CheckStatus:
-                    lblHM1XConnectionStatus.Text = "Connected";
-                    lblHM1XConnectionStatus.BackColor = Color.LimeGreen;
-                    serialSystemUpdate(this, "HM-1X said '" + tempBuffer + "'\n", 100, Color.LimeGreen);
-                    break;
-            }
+            // Updates UI after a data RX'ed event.
+            serialPorts.updateUIAfterDataRX(this, originator, value, rtbMainDisplay, txbSysMsg, pbSysStatus, lblHM1XConnectionStatus);
         }
 
 
@@ -517,6 +510,11 @@ namespace HM_1X_Aid_v01
         private void btnClearSettings_Click(object sender, EventArgs e)
         {
             resetSettings();
+        }
+
+        private void cmbHM1XCommands_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cmbHM1XSettings.Items.Clear();
         }
     }
 

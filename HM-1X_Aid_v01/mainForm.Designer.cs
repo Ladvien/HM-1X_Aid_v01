@@ -135,7 +135,7 @@
             // 
             this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(74, 4);
             // 
             // mnuMainMenu
             // 
@@ -793,6 +793,7 @@
             this.cmbHM1XCommands.Name = "cmbHM1XCommands";
             this.cmbHM1XCommands.Size = new System.Drawing.Size(387, 28);
             this.cmbHM1XCommands.TabIndex = 1;
+            this.cmbHM1XCommands.SelectedIndexChanged += new System.EventHandler(this.cmbHM1XCommands_SelectedIndexChanged);
             // 
             // cmbHM1XSettings
             // 
