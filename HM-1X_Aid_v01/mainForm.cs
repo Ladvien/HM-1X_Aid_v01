@@ -228,9 +228,10 @@ namespace HM_1X_Aid_v01
 
         private void HM1XSettingsBoxChanged(object sender, EventArgs e)
         {
-            if(cmbHM1XCommands.Items.Count > 0)
+            hm1xConstants.hm1xEnumCommands selectedEnumeration = (hm1xConstants.hm1xEnumCommands) cmbHM1XCommands.SelectedIndex;
+            if (cmbHM1XCommands.Items.Count > 0)
             {
-                serialPorts.addHM1XSettingsToComboBox(cmbHM1XSettings, cmbHM1XCommands.SelectedItem.ToString(), txbSysMsg);
+                serialPorts.addHM1XSettingsToComboBox(cmbHM1XSettings, selectedEnumeration, txbSysMsg);
             }
              
         }
@@ -504,7 +505,6 @@ namespace HM_1X_Aid_v01
         {
             ComboBox comboBox = (ComboBox)sender;
             serialPorts.setModuleType(comboBox.SelectedIndex);
-
         }
 
         private void btnClearSettings_Click(object sender, EventArgs e)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace HM_1X_Aid_v01
 {
@@ -29,6 +30,7 @@ namespace HM_1X_Aid_v01
             DiscoveryParameter, TemperatureSensor, ICTemperature, RemoteDeviceTimeout, BondType, Service, WakeThroughUART, Version
         }
 
+        public enum hm1xDeviceType : int { Unknown = 0, HM10 = 1, HM11 = 2, HM15 = 3 };
 
         public static string[] hm1xCommandsExplained =
         {                                       // Enumerated Command
@@ -108,7 +110,147 @@ namespace HM_1X_Aid_v01
             "Wake Through UART",
             "Version"
         };
+    }
 
+    public class hm1xSettings
+    {
+        public void getSettingsHM10(ComboBox comboBox, List<string> settings, hm1xConstants.hm1xEnumCommands command)
+        {
+            switch (command)
+            {
+                //"AT"
+                case hm1xConstants.hm1xEnumCommands.CheckStatus:
+                    comboBox.Enabled = false;
+                    break;
+                //"None"
+                case hm1xConstants.hm1xEnumCommands.None:
+                    comboBox.Enabled = false;
+                    break;
+                //"AT+ADC"
+                case hm1xConstants.hm1xEnumCommands.ADC:
+                    settings.Add("Pin 4");
+                    comboBox.Items.Add("4?");
+                    settings.Add("Pin 5");
+                    comboBox.Items.Add("5?");
+                    settings.Add("Pin 6");
+                    comboBox.Items.Add("6?");
+                    settings.Add("Pin 7");
+                    comboBox.Items.Add("7?");
+                    settings.Add("Pin 8");
+                    comboBox.Items.Add("8?");
+                    settings.Add("Pin 9");
+                    comboBox.Items.Add("9?");
+                    settings.Add("Pin A");
+                    comboBox.Items.Add("A?");
+                    settings.Add("Pin B");
+                    comboBox.Items.Add("B?");
+                    comboBox.Enabled = true;
+                    comboBox.SelectedIndex = 0;
+                    break;
+                case hm1xConstants.hm1xEnumCommands.Version:
+                    comboBox.Items.Add("?");
+                    comboBox.Enabled = true;
+                    comboBox.SelectedIndex = 0;
+                    break;
+               case hm1xConstants.hm1xEnumCommands.LastConnectedAddress:
+                    comboBox.Items.Add("?");
+                    comboBox.Enabled = true;
+                    comboBox.SelectedIndex = 0;
+                    break;
+                case hm1xConstants.hm1xEnumCommands.AdvertizingInterval:
+                    comboBox.Items.Add("?");
+                    comboBox.Items.Add("0");
+                    comboBox.Items.Add("1");
+                    comboBox.Items.Add("2");
+                    comboBox.Items.Add("3");
+                    comboBox.Items.Add("4");
+                    comboBox.Items.Add("5");
+                    comboBox.Items.Add("6");
+                    comboBox.Items.Add("7");
+                    comboBox.Items.Add("8");
+                    comboBox.Items.Add("9");
+                    comboBox.Enabled = true;
+                    comboBox.SelectedIndex = 0;
+                    break;
+      
+
+
+            //"AT+ADDR"
+            //"AT+ADVI"
+            //"AT+ADTY"
+            //"AT+ANCS"
+            //"AT+ALLO"
+            //"AT+AD"
+            //"AT+BEFC"
+            //"AT+AFTC"
+            //"AT+BATC"
+            //"AT+BATT",
+            //"AT+BIT",
+            //"AT+BAUD",
+            //"AT+COMI",
+            //"AT+COMA",
+            //"AT+COLA",
+            //"AT+COUP",
+            //"AT+CHAR", 
+            //"AT+CLEAR",
+            //"AT+CONL",
+            //"AT+CO",
+            //"AT+COL",
+            //"AT+CYC", 
+            //"AT+DISC", 
+            //"AT+DISI", 
+            //"AT+CONN", 
+            //"AT+DELO", 
+            //"AT+ERASE", 
+            //"AT+FLAG", 
+            //"AT+FILT", 
+            //"AT+FIOW", 
+            //"AT+GAIN",
+            //"AT+HELP
+            //"AT+IMME
+            //"AT+IBEA
+            //"AT+BEA0
+            //"AT+BEA1
+            //"AT+BEA2
+            //"AT+BEA3
+            //"AT+MARJ
+            //"AT+MINO
+            //"AT+MEAS
+            //"AT+MODE
+            //"AT+NOTI
+            //"AT+NOTP
+            //"AT+NAME
+            //"AT+PCTL
+            //"AT+PARI
+            //"AT+PIO
+            //"AT+PASS
+            //"AT+PIN
+            //"AT+POWE
+            //"AT+PWRM
+            //"AT+RELI
+            //"AT+RENEW
+            //"AT+RESTART
+            //"AT+ROLE
+            //"AT+RSSI
+            //"AT+RADD
+            //"AT+RAT
+            //"AT+STOP
+            //"AT+START
+            //"AT+SLEEP
+            //"AT+SAVE
+            //"AT+SENS
+            //"AT+SHOW
+            //"AT+TEHU
+            //"AT+TEMP
+            //"AT+TCON
+            //"AT+TYPE
+            //"AT+UUID
+            //"AT+UART
+            //"AT+VERS"
+        }
+        }
+        
 
     }
+
 }

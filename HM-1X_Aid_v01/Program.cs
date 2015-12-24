@@ -30,14 +30,14 @@ class SerialPortsExtended: SerialPort
 
     SerialPort ComPort = new SerialPort();
     hm1xConstants hm1xConstants = new hm1xConstants();
+    hm1xSettings hm1xSettings = new hm1xSettings();
 
     enum charsAfterRXTX : int { None = 0, LineFeed, CarriageReturn, CarriageReturnLineFeed, LineFeedCarriageReturn };
-    enum hm1xDeviceType : int { Unknown = 0, HM10 = 1, HM11 = 2, HM15 = 3};
+    
 
     
 
-    Dictionary<hm1xDeviceType, string> HM1XCommandEnumLookUp = new Dictionary<hm1xDeviceType, string>();
-
+    
     // Open port flag.
     private bool portOpen = false;
 
@@ -46,24 +46,13 @@ class SerialPortsExtended: SerialPort
     private bool captureStream = false;
     
 
-    
-    public enum hm1xEnumCommands : int { None = 0, CheckStatus, ADC, MACAddress, AdvertizingInterval, AdvertizingType, ANCS, Whitelist, WhitelistMACAddress, PIOStateAfterPowerOn, PIOStateAfterConnection,
-                                         BatteryMonitor, BatteryInformation, BitFormat, BaudRate, MinLinkLayerInterval, MaxLinkLayerInterval, LinkLayerSlaveLatency, UpdateConnectionParameter, Characteristic,
-                                         ClearLastConnected, TryLastConnected, TryConnectionAddress, PIOState, PIOCollectionRate, StartDiscovery, StartiBeaconDiscovery, ConnectToDiscoveredDevice, iBeaconMode, RemoveBondInfo,
-                                         AdvertizingFlag, HM1XConnectionFilter,  FlowControlSwitch, RXGain, Help, WorkType, iBeaconModeSwitch, iBeaconUUID0, iBeaconUUID1, iBeaconUUID2, IbeaconUUID3,
-                                         iBeaconMajorVersion, iBeaconMinorVersion, iBeaconMeasuredPower,WorkMode, ConnectionNotification, ConnNotificationMode, Name, OutputDriver, Parity, ConnectionLEDMode, SetPIOTemp, Pin,
-                                         PowerLevel, SleepType, ReliableAdvertizing, Renew, Reset, Role, RSSI, LastConnectedAddress, SensorWorkInterval,StopBits, StartWork, Sleep, SaveConnectedAddress, SensorType,
-                                         DiscoveryParameter, TemperatureSensor, ICTemperature, RemoteDeviceTimeout, BondType, Service, WakeThroughUART, Version}
-
-    string[] hm1xCommandsExplained = { };
-
-    Dictionary<string, hm1xEnumCommands> hm1xCommandsDict = new Dictionary<string, hm1xEnumCommands>();
-    Dictionary<string, hm1xEnumCommands> hm1xCommandsExplainedDict = new Dictionary<string, hm1xEnumCommands>();
+    Dictionary<string, hm1xConstants.hm1xEnumCommands> hm1xCommandsDict = new Dictionary<string, hm1xConstants.hm1xEnumCommands>();
+    Dictionary<string, hm1xConstants.hm1xEnumCommands> hm1xCommandsExplainedDict = new Dictionary<string, hm1xConstants.hm1xEnumCommands>();
 
     private static System.Timers.Timer HM1Xtimer;
-    hm1xEnumCommands waitingOn = 0;
-    hm1xDeviceType hm1xModuleType = 0;
-
+    hm1xConstants.hm1xEnumCommands waitingOn = 0;
+    hm1xConstants.hm1xDeviceType hm1xModuleType = 0;
+    
 
     // Device characteristics.
     private bool hm1xConnected = false;
@@ -101,11 +90,10 @@ class SerialPortsExtended: SerialPort
     {
         HM1XupdatedEventHandler += new SerialPortsExtended.HM1Xupdated(HM1XupdateValue);
         int index = 0;
-        foreach (hm1xEnumCommands commands in Enum.GetValues(typeof(hm1xEnumCommands)))
+        foreach (hm1xConstants.hm1xEnumCommands commands in Enum.GetValues(typeof(hm1xConstants.hm1xEnumCommands)))
         {
             hm1xCommandsDict.Add(hm1xConstants.hm1xCommandsString[index], commands);
             hm1xCommandsExplainedDict.Add(hm1xConstants.hm1xCommandsExplained[index], commands);
-            Console.WriteLine("{0}   {1}", hm1xConstants.hm1xCommandsString[index], hm1xConstants.hm1xCommandsExplained[index]);
             index++;
         }
 
@@ -575,7 +563,7 @@ class SerialPortsExtended: SerialPort
 
         if (commandComboBox.Items.Count > 0)
         {
-            command = commandComboBox.SelectedItem.ToString();
+            command = hm1xConstants.hm1xCommandsString[commandComboBox.SelectedIndex];
         }
         if (settingsComboBox.Items.Count > 0)
         {
@@ -585,7 +573,6 @@ class SerialPortsExtended: SerialPort
         {
             textBox = sendTextBox.Text;
         }
-
         if (command != "")
         {
             finalCommand += command;
@@ -603,7 +590,8 @@ class SerialPortsExtended: SerialPort
         {
             WriteData(finalCommand);
         }
-        waitingOn = hm1xCommandsDict[commandComboBox.SelectedItem.ToString()];
+        hm1xConstants.hm1xEnumCommands commandComboBoxSelectedIndexAsEnum = (hm1xConstants.hm1xEnumCommands)commandComboBox.SelectedIndex;
+        waitingOn = commandComboBoxSelectedIndexAsEnum;
         HM1XCallbackSetTimer(200); // Wait half a second for reply.
         SerialSystemUpdateHandler(this, "", 50, Color.LimeGreen);
     }
@@ -624,30 +612,30 @@ class SerialPortsExtended: SerialPort
         if(captureBuffer != "") {
             switch (waitingOn)
             {
-                case hm1xEnumCommands.None:
+                case hm1xConstants.hm1xEnumCommands.None:
                     HM1XupdatedHandler(this, waitingOn, captureBuffer);
                     break;
-                case hm1xEnumCommands.Version:
+                case hm1xConstants.hm1xEnumCommands.Version:
                     setVersion();
                     HM1XupdatedHandler(this, waitingOn, captureBuffer);
-                    waitingOn = hm1xEnumCommands.None;
+                    waitingOn = hm1xConstants.hm1xEnumCommands.None;
                     break;
-                case hm1xEnumCommands.CheckStatus:
+                case hm1xConstants.hm1xEnumCommands.CheckStatus:
                     setHM1XConnection();
                     HM1XupdatedHandler(this, waitingOn, captureBuffer);
-                    waitingOn = hm1xEnumCommands.None;
+                    waitingOn = hm1xConstants.hm1xEnumCommands.None;
                     break;
-                case hm1xEnumCommands.ADC:
+                case hm1xConstants.hm1xEnumCommands.ADC:
                     HM1XupdatedHandler(this, waitingOn, captureBuffer);
-                    waitingOn = hm1xEnumCommands.None;
+                    waitingOn = hm1xConstants.hm1xEnumCommands.None;
                     break;
-                case hm1xEnumCommands.MACAddress:
+                case hm1xConstants.hm1xEnumCommands.MACAddress:
                     HM1XupdatedHandler(this, waitingOn, captureBuffer);
-                    waitingOn = hm1xEnumCommands.None;
+                    waitingOn = hm1xConstants.hm1xEnumCommands.None;
                     break;
-                case hm1xEnumCommands.AdvertizingInterval:
+                case hm1xConstants.hm1xEnumCommands.AdvertizingInterval:
                     HM1XupdatedHandler(this, waitingOn, captureBuffer);
-                    waitingOn = hm1xEnumCommands.None;
+                    waitingOn = hm1xConstants.hm1xEnumCommands.None;
                     break;
             }
         } else {
@@ -667,17 +655,17 @@ class SerialPortsExtended: SerialPort
 
     private void HM1XupdateValue(object sender, object originator, object value)
     {
-        SerialPortsExtended.hm1xEnumCommands switchValue = (SerialPortsExtended.hm1xEnumCommands)originator;
+        hm1xConstants.hm1xEnumCommands switchValue = (hm1xConstants.hm1xEnumCommands)originator;
         switch (switchValue)
         {
-            case SerialPortsExtended.hm1xEnumCommands.None:
-                //SerialSystemUpdateHandler(this, "Error" + SerialPortsExtended.hm1xEnumCommands.Version.ToString(), 100, Color.Crimson);
+            case hm1xConstants.hm1xEnumCommands.None:
+                //SerialSystemUpdateHandler(this, "Error" + hm1xConstants.hm1xEnumCommands.Version.ToString(), 100, Color.Crimson);
                 break;
-            case SerialPortsExtended.hm1xEnumCommands.CheckStatus:
+            case hm1xConstants.hm1xEnumCommands.CheckStatus:
                 // ADD LATER.
                 break;
-            case SerialPortsExtended.hm1xEnumCommands.Version:
-              //  SerialSystemUpdateHandler(this, "Completed " + SerialPortsExtended.hm1xEnumCommands.Version.ToString(), 100, Color.LimeGreen);
+            case hm1xConstants.hm1xEnumCommands.Version:
+              //  SerialSystemUpdateHandler(this, "Completed " + hm1xConstants.hm1xEnumCommands.Version.ToString(), 100, Color.LimeGreen);
                 break;
         }
     }
@@ -687,22 +675,22 @@ class SerialPortsExtended: SerialPort
 
         String valueString = (string)value;
 
-        SerialPortsExtended.hm1xEnumCommands switchValue = (SerialPortsExtended.hm1xEnumCommands)originator;
+        hm1xConstants.hm1xEnumCommands switchValue = (hm1xConstants.hm1xEnumCommands)originator;
         switch (switchValue)
         {
-            case SerialPortsExtended.hm1xEnumCommands.CheckStatus:
+            case hm1xConstants.hm1xEnumCommands.CheckStatus:
                 label.Text = "Connected";
                 label.BackColor = Color.LimeGreen;
                 progressBar.BackColor = Color.LimeGreen;
                 progressBar.Value = 100;
                 setHM1XConnection();
                 break;
-            case SerialPortsExtended.hm1xEnumCommands.Version:
+            case hm1xConstants.hm1xEnumCommands.Version:
                 progressBar.BackColor = Color.LimeGreen;
                 progressBar.Value = 100;
                 mainDisplay.Text += "Firmware version: " + value.ToString() +"\n";
                 break;
-            case SerialPortsExtended.hm1xEnumCommands.ADC:
+            case hm1xConstants.hm1xEnumCommands.ADC:
                 progressBar.BackColor = Color.LimeGreen;
                 progressBar.Value = 100;
                 sysTextBox.Text += "Got ADC Value.\n";
@@ -710,7 +698,7 @@ class SerialPortsExtended: SerialPort
                 valueString += "\n";
                 mainDisplay.Text += valueString;
                 break;
-            case SerialPortsExtended.hm1xEnumCommands.MACAddress:
+            case hm1xConstants.hm1xEnumCommands.MACAddress:
                 progressBar.BackColor = Color.LimeGreen;
                 progressBar.Value = 100;
                 sysTextBox.Text += "Got MAC.\n";
@@ -718,7 +706,7 @@ class SerialPortsExtended: SerialPort
                 valueString += "\n";
                 mainDisplay.Text += valueString;
                 break;
-            case SerialPortsExtended.hm1xEnumCommands.AdvertizingInterval:
+            case hm1xConstants.hm1xEnumCommands.AdvertizingInterval:
                 progressBar.BackColor = Color.LimeGreen;
                 progressBar.Value = 100;
                 sysTextBox.Text += "Got Advertizing.\n";
@@ -738,7 +726,7 @@ class SerialPortsExtended: SerialPort
 
     public void setModuleType(int type)
     { 
-        hm1xModuleType = (hm1xDeviceType)type; 
+        hm1xModuleType = (hm1xConstants.hm1xDeviceType)type; 
     }
 
 
@@ -748,7 +736,7 @@ class SerialPortsExtended: SerialPort
         SerialSystemUpdateHandler(this, "Connecting to HM-1X\n", 0, Color.LimeGreen);
         captureStream = true;
         WriteData("AT"); // Command to get version info.
-        waitingOn = hm1xEnumCommands.CheckStatus;
+        waitingOn = hm1xConstants.hm1xEnumCommands.CheckStatus;
         HM1XCallbackSetTimer(200); // Wait half a second for reply.
         SerialSystemUpdateHandler(this, "", 50, Color.LimeGreen);
     }
@@ -795,81 +783,11 @@ class SerialPortsExtended: SerialPort
 
     public void addHM1XCommandsToComboBox(ComboBox comboBox, int defaultIndex)
     {
-        // Fills a referenced combobox with data bits settings.
-        comboBox.Items.Add("AT");
-        comboBox.Items.Add("AT+ADC");
-        comboBox.Items.Add("AT+ADDR");
-        comboBox.Items.Add("AT+ADVI");
-        comboBox.Items.Add("AT+ADTY");
-        comboBox.Items.Add("AT+ANCS");
-        comboBox.Items.Add("AT+ALLO");
-        comboBox.Items.Add("AT+AD");
-        comboBox.Items.Add("AT+BEFC");
-        comboBox.Items.Add("AT+AFTC");
-        comboBox.Items.Add("AT+BATC");
-        comboBox.Items.Add("AT+BATT");
-        comboBox.Items.Add("AT+BIT");
-        comboBox.Items.Add("AT+BAUD");
-        comboBox.Items.Add("AT+COMI");
-        comboBox.Items.Add("AT+COMA");
-        comboBox.Items.Add("AT+COLA");
-        comboBox.Items.Add("AT+COUP");
-        comboBox.Items.Add("AT+CHAR");
-        comboBox.Items.Add("AT+CLEAR");
-        comboBox.Items.Add("AT+CONL");
-        comboBox.Items.Add("AT+CO");
-        comboBox.Items.Add("AT+COL");
-        comboBox.Items.Add("AT+CYC");
-        comboBox.Items.Add("AT+DISC");
-        comboBox.Items.Add("AT+DISI");
-        comboBox.Items.Add("AT+CONN");
-        comboBox.Items.Add("AT+DELO");
-        comboBox.Items.Add("AT+ERASE");
-        comboBox.Items.Add("AT+FLAG");
-        comboBox.Items.Add("AT+FILT");
-        comboBox.Items.Add("AT+FIOW");
-        comboBox.Items.Add("AT+GAIN");
-        comboBox.Items.Add("AT+HELP");
-        comboBox.Items.Add("AT+IMME");
-        comboBox.Items.Add("AT+IBEA");
-        comboBox.Items.Add("AT+BEA0");
-        comboBox.Items.Add("AT+BEA1");
-        comboBox.Items.Add("AT+BEA2");
-        comboBox.Items.Add("AT+BEA3");
-        comboBox.Items.Add("AT+MARJ");
-        comboBox.Items.Add("AT+MINO");
-        comboBox.Items.Add("AT+MEAS");
-        comboBox.Items.Add("AT+MODE");
-        comboBox.Items.Add("AT+NOTI");
-        comboBox.Items.Add("AT+NOTP");
-        comboBox.Items.Add("AT+NAME");
-        comboBox.Items.Add("AT+PCTL");
-        comboBox.Items.Add("AT+PARI");
-        comboBox.Items.Add("AT+PIO");
-        comboBox.Items.Add("AT+PASS");
-        comboBox.Items.Add("AT+PIN");
-        comboBox.Items.Add("AT+POWE");
-        comboBox.Items.Add("AT+PWRM");
-        comboBox.Items.Add("AT+RELI");
-        comboBox.Items.Add("AT+RENEW");
-        comboBox.Items.Add("AT+RESTART");
-        comboBox.Items.Add("AT+ROLE");
-        comboBox.Items.Add("AT+RSSI");
-        comboBox.Items.Add("AT+RADD");
-        comboBox.Items.Add("AT+RAT");
-        comboBox.Items.Add("AT+STOP");
-        comboBox.Items.Add("AT+START");
-        comboBox.Items.Add("AT+SLEEP");
-        comboBox.Items.Add("AT+SAVE");
-        comboBox.Items.Add("AT+SENS");
-        comboBox.Items.Add("AT+SHOW");
-        comboBox.Items.Add("AT+TEHU");
-        comboBox.Items.Add("AT+TEMP");
-        comboBox.Items.Add("AT+TCON");
-        comboBox.Items.Add("AT+TYPE");
-        comboBox.Items.Add("AT+UUID");
-        comboBox.Items.Add("AT+UART");
-        comboBox.Items.Add("AT+VERS");
+        foreach(string commandString in hm1xConstants.hm1xCommandsExplained)
+        {
+            comboBox.Items.Add(commandString);
+        }
+        
         if (defaultIndex > comboBox.Items.Count)
         {
             defaultIndex = comboBox.Items.Count;
@@ -893,70 +811,22 @@ class SerialPortsExtended: SerialPort
 
 
 
-    public void addHM1XSettingsToComboBox(ComboBox comboBox, string commandName, TextBox sysLogTextBox)
+    public void addHM1XSettingsToComboBox(ComboBox comboBox, hm1xConstants.hm1xEnumCommands commandValue, TextBox sysLogTextBox)
     {
-        if (hm1xModuleType == hm1xDeviceType.Unknown)
+        if (hm1xModuleType == hm1xConstants.hm1xDeviceType.Unknown)
         {
-            sysLogTextBox.Text = "Please discover module type.";
+            sysLogTextBox.Text = "Please select module type.";
         }
         else
         {
+            List<string> readableCommandsList = new List<string>();
+
             // Fills a referenced combobox with HM1X settings.
-            switch (commandName)
-            {
-                case "AT":
-                    switch (hm1xModuleType)
-                    {
-                        case hm1xDeviceType.HM10:
-                            break;
-                        case hm1xDeviceType.HM11:
-                            break;
-                        case hm1xDeviceType.HM15:
-                            break;
-                    }
-                    break;
-                case "AT+VERS":
-                    comboBox.Items.Add("?");
-                    comboBox.Enabled = true;
-                    comboBox.SelectedIndex = 0;
-                    break;
-                case "AT+ADC":
-                    comboBox.Items.Add("4?");
-                    comboBox.Items.Add("5?");
-                    comboBox.Items.Add("6?");
-                    comboBox.Items.Add("7?");
-                    comboBox.Items.Add("8?");
-                    comboBox.Items.Add("9?");
-                    comboBox.Items.Add("A?");
-                    comboBox.Items.Add("B?");
-                    comboBox.Enabled = true;
-                    comboBox.SelectedIndex = 0;
-                    break;
-                case "AT+ADDR":                    
-                    comboBox.Items.Add("?");
-                    comboBox.Enabled = true;
-                    comboBox.SelectedIndex = 0;
-                    break;
-                case "AT+ADVI":
-                    comboBox.Items.Add("?");
-                    comboBox.Items.Add("0");
-                    comboBox.Items.Add("1");
-                    comboBox.Items.Add("2");
-                    comboBox.Items.Add("3");
-                    comboBox.Items.Add("4");
-                    comboBox.Items.Add("5");
-                    comboBox.Items.Add("6");
-                    comboBox.Items.Add("7");
-                    comboBox.Items.Add("8");
-                    comboBox.Items.Add("9");
-                    comboBox.Enabled = true;
-                    comboBox.SelectedIndex = 0;
-                    break;
-            }
+            hm1xSettings.getSettingsHM10(comboBox, readableCommandsList, commandValue);   
         }
 
         // Default to 
         // comboBox.SelectedIndex = 0;
-    }
+}
     ///// HM-1X END/////////////////////////////////////////////////////////////////////////////////////
 }
