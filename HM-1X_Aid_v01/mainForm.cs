@@ -141,6 +141,14 @@ namespace HM_1X_Aid_v01
         {
             // Updates UI after a data RX'ed event.
             serialPorts.updateUIAfterDataRX(this, originator, value, rtbMainDisplay, txbSysMsg, pbSysStatus, lblHM1XConnectionStatus);
+
+            // This enables settings ONLY after HM-1X responds with "OK".
+            if(lblHM1XConnectionStatus.Text == "Connected")
+            {
+                cmbHM1XSettings.Enabled = true;
+                btnConfirmHM1XSetting.Enabled = true;
+            }
+
         }
 
 
@@ -236,9 +244,6 @@ namespace HM_1X_Aid_v01
                 serialPorts.addHM1XCommandsToComboBox(cmbHM1XCommands, 0);
 
                 loadSettings();
-                hm1xConstants.hm1xEnumCommands selectedEnumeration = (hm1xConstants.hm1xEnumCommands)cmbHM1XCommands.SelectedIndex;
-                Console.WriteLine(selectedEnumeration.ToString());
-                serialPorts.addHM1XSettingsToComboBox(cmbHM1XSettings, selectedEnumeration, txbParameterOne, txbParameterTwo, lblParameterOne, lblParameterTwo, txbSysMsg, btnConfirmHM1XSetting);
 
             }
             serialSystemUpdate(this, "Loaded COM info.\n", 100, Color.LimeGreen);
@@ -251,9 +256,6 @@ namespace HM_1X_Aid_v01
             {
                 serialPorts.addHM1XSettingsToComboBox(cmbHM1XSettings, selectedEnumeration, txbParameterOne, txbParameterTwo, lblParameterOne, lblParameterTwo, txbSysMsg, btnConfirmHM1XSetting);
             }
-
-
-             
         }
 
         private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
@@ -401,12 +403,23 @@ namespace HM_1X_Aid_v01
                     serialPorts.setReadTimeout(1000);
                     serialPorts.setWriteTimeout(1000);
                     btnConnect.Text = "Disconnect";
+
+                    // Clears SerialPortsExtended settings.
+                    hm1xConstants.hm1xEnumCommands selectedEnumeration = (hm1xConstants.hm1xEnumCommands)cmbHM1XCommands.SelectedIndex;
+                    serialPorts.addHM1XSettingsToComboBox(cmbHM1XSettings, selectedEnumeration, txbParameterOne, txbParameterTwo, lblParameterOne, lblParameterTwo, txbSysMsg, btnConfirmHM1XSetting);
+                    cmbHM1XSettings.Enabled = false;
+                    btnConfirmHM1XSetting.Enabled = false;
+//                    serialPorts.clearCaptureFlag();
                 }
                 else // If the port didn't connect, make sure UI reflects it.
                 {
-                    togglePortMenu(true);
+                    togglePortMenu(false);
                     btnConnectHM1X.Enabled = false;
                     btnConnect.Text = "Connect";
+                    cmbHM1XSettings.Enabled = false;
+                    btnConfirmHM1XSetting.Enabled = false;
+//                    serialPorts.clearCaptureFlag();
+                    serialPorts.closePort();
                 }
                 serialPorts.updateConnectionLabel(lblConnectionStatus);
             }
@@ -414,10 +427,13 @@ namespace HM_1X_Aid_v01
             {
                 togglePortMenu(true);
                 btnConnectHM1X.Enabled = false;
-                serialPorts.closePort();
                 serialPorts.updateConnectionLabel(lblConnectionStatus);
                 btnConnect.Text = "Connect";
                 btnConnectHM1X.Enabled = false;
+                cmbHM1XSettings.Enabled = false;
+                btnConfirmHM1XSetting.Enabled = false;
+                serialPorts.clearCaptureFlag();
+                serialPorts.closePort();
             }
         }
 
@@ -513,8 +529,6 @@ namespace HM_1X_Aid_v01
             // 1. Connect (send "AT" and get "OK").
             // 2. Get list of basic module info.
             // 3. Populate drop down with AT commands.
-
-
             toggleHM1XMenu(true);
             serialPorts.connectToHM1X();
 
@@ -561,6 +575,17 @@ namespace HM_1X_Aid_v01
                         txbParameterOne.Visible = true;
                         lblParameterOne.Text = "MAC Address (12 digits)";
                         lblParameterOne.Visible = true;
+                    }
+                    break;
+                case hm1xConstants.hm1xEnumCommands.PIOStateAfterPowerOn:
+                    if (cmbHM1XSettings.SelectedIndex > 0)
+                    {
+                        txbParameterOne.Visible = true;
+                        lblParameterOne.Text = "1 = HIGH, 0 = LOW.";
+                        lblParameterTwo.Text = "Pin 0 to B";
+                        lblParameterOne.Visible = true;
+                        lblParameterTwo.Visible = true;
+
 
                     }
                     break;

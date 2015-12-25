@@ -36,11 +36,11 @@ class SerialPortsExtended: SerialPort
     
     // Open port flag.
     private bool portOpen = false;
+    bool dataHandlerAttached = false;
 
     // HM-1X //////////////////////
     private string captureBuffer = "";
     private bool captureStream = false;
-    
 
     Dictionary<string, hm1xConstants.hm1xEnumCommands> hm1xCommandsDict = new Dictionary<string, hm1xConstants.hm1xEnumCommands>();
     Dictionary<string, hm1xConstants.hm1xEnumCommands> hm1xCommandsExplainedDict = new Dictionary<string, hm1xConstants.hm1xEnumCommands>();
@@ -49,11 +49,9 @@ class SerialPortsExtended: SerialPort
     hm1xConstants.hm1xEnumCommands waitingOn = 0;
     hm1xConstants.hm1xDeviceType hm1xModuleType = 0;
     
-
     // Device characteristics.
     private bool hm1xConnected = false;
     private int hm1xVersion = 0;
-
 
     // HM-1X END //////////////////
 
@@ -94,8 +92,6 @@ class SerialPortsExtended: SerialPort
             hm1xCommandsExplainedDict.Add(hm1xConstants.hm1xCommandsExplained[index], commands);
             index++;
         }
-
-
     }
 
     // Setters for the timeouts.
@@ -124,9 +120,8 @@ class SerialPortsExtended: SerialPort
     // Open port using string identifiers.
     public void openPort(string port, string baudRate, string dataBits, string stopBits, string parity, string handshaking)
     {
-        Console.WriteLine(hm1xCommandsDict);
- 
         SerialSystemUpdateHandler(this, "Trying port " + port + "\n", 0, Color.LimeGreen);
+        // Open if port isn't and there is at least one port listed.
         if (portOpen == false && portList.Count > 0)
         {
             ComPort.PortName = Convert.ToString(port);
@@ -138,7 +133,14 @@ class SerialPortsExtended: SerialPort
             try
             {
                 ComPort.Open();
-                ComPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+
+                // Only create one data handler, otherwise to whom do we listen?
+                if (!dataHandlerAttached)
+                {
+                    ComPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+                    dataHandlerAttached = true;
+                }
+
                 SerialSystemUpdateHandler(this, "Opened port " + port + "\n", 100, Color.LimeGreen);
             }
             catch (UnauthorizedAccessException ex)
@@ -161,7 +163,7 @@ class SerialPortsExtended: SerialPort
         {
             ComPort.Close();
             portOpen = false;
-            SerialSystemUpdateHandler(this, "Closing all ports.\n", 100, Color.LimeGreen);
+            SerialSystemUpdateHandler(this, "Closed all ports.\n", 100, Color.LimeGreen);
         }
         catch (UnauthorizedAccessException ex) { MessageBox.Show(ex.Message);
             SerialSystemUpdateHandler(this, "Failed to close port(s).\n", 100, Color.Crimson);
@@ -170,6 +172,7 @@ class SerialPortsExtended: SerialPort
 
     public bool isPortOpen()
     {
+        // Well, is it?
         return portOpen;
     }
 
@@ -384,7 +387,6 @@ class SerialPortsExtended: SerialPort
     public string convertASCIIStringToDecimalString(string text)
     {
         string result = "";
-
         try
         {
             char[] values = text.ToCharArray();
@@ -412,7 +414,6 @@ class SerialPortsExtended: SerialPort
             result = result.Replace("0x", "");
 
             byte[] byteArray = StringToByteArrayFastest(result);
-
 
             int index = 0;
             while (index < byteArray.Length)
@@ -461,8 +462,6 @@ class SerialPortsExtended: SerialPort
             return byteArray;
         }
     }
-
-
 
     public static byte[] StringToByteArrayFastest(string hex)
     {
@@ -538,13 +537,13 @@ class SerialPortsExtended: SerialPort
 
     // 1. Populate combo boxes.
     // 2. Capture stream.
-    // 3. Send command to module.
+    // 3. Build the command dynamically.
     // 4. Set onWaiting to what command is being waited on.
-    // 5. Set timer.
+    // 5. Set response timeout timer.
     // 6. When HM1X sends response analyze it for validity.
     //    OR when timer expires, decide if we got a valid response.S
-    // 7. If no valid response was obtained, sned last command.
-    // 8. Repeat 7. until timeout or valid response.
+    // 7. If no valid response was obtained, send last command again.
+    // 8. Repeat 7. until attempt thresehold or valid response is received.
     // 9. Set appropriate variable based upon response.
     // 10. Release stream.
 
@@ -630,6 +629,12 @@ class SerialPortsExtended: SerialPort
         }       
     }
 
+    public void clearCaptureFlag()
+    {
+        captureStream = false;
+        captureBuffer = "";
+    }
+
     // Read Data.
     private void HM1XupdatedHandler(object sender, object originator, object value)
     {
@@ -667,6 +672,9 @@ class SerialPortsExtended: SerialPort
         string getOrSet = "";
         String valueString = (string)value;
         int replySwitch = 0;
+        byte replyByte = 0x00;
+        UInt16 endianCorrectedByte = 0x00;
+        bool isSet = false;
 
         hm1xConstants.hm1xEnumCommands switchValue = (hm1xConstants.hm1xEnumCommands)originator;
         switch (switchValue)
@@ -757,7 +765,7 @@ class SerialPortsExtended: SerialPort
                 progressBar.Value = 75;
                 sysTextBox.Text += "Got ANCS.\n";
 
-                isItGetOrSet(valueString, out getOrSet, out replySwitch);
+                isItGetOrSet(valueString, out getOrSet, out replySwitch,out isSet);
 
                 valueString = getOrSet;
 
@@ -794,7 +802,7 @@ class SerialPortsExtended: SerialPort
                 progressBar.Value = 75;
                 sysTextBox.Text += "Got ALLO.\n";
 
-                isItGetOrSet(valueString, out getOrSet, out replySwitch);
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
 
                 valueString = getOrSet;
 
@@ -817,7 +825,7 @@ class SerialPortsExtended: SerialPort
                 progressBar.Value = 75;
                 sysTextBox.Text += "Got AD.\n";
 
-                isItGetOrSet(valueString, out getOrSet, out replySwitch);
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
 
                 string macAddress = "";
 
@@ -831,6 +839,18 @@ class SerialPortsExtended: SerialPort
                 {
                     macAddress = "Whitelist MAC 3: " + valueString.Replace("OK+AD3?:", "");
                 }
+                else if (valueString.Contains("OK+AD1"))
+                {
+                    macAddress = "Set Whitelist MAC Address 1 to: " + valueString.Replace("OK+AD1", "");
+                }
+                else if (valueString.Contains("OK+AD2"))
+                {
+                    macAddress = "Set Whitelist MAC Address 2 to: " + valueString.Replace("OK+AD2", "");
+                }
+                else if (valueString.Contains("OK+AD3"))
+                {
+                    macAddress = "Set Whitelist MAC Address 3 to: " + valueString.Replace("OK+AD3", "");
+                }
 
                 valueString = macAddress;
                 valueString += "\n";
@@ -838,30 +858,107 @@ class SerialPortsExtended: SerialPort
                 progressBar.BackColor = Color.LimeGreen;
                 progressBar.Value = 100;
                 break;
+            case hm1xConstants.hm1xEnumCommands.PIOStateAfterPowerOn:
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 75;
+                sysTextBox.Text += "Got BEFC.\n";
 
+
+                isItGetOrSetSAndByte(valueString, out getOrSet, out replyByte, out endianCorrectedByte, out isSet);
+                Console.WriteLine(replyByte);
+
+
+                if (isSet)
+                {
+
+                } else
+                {
+                    string[] pinInfo = { "Pin B", "Pin A", "Pin 9", "Pin 8", "Pin 7", "Pin 6", "Pin 5", "Pin 4", "Pin 3", "Pin 2", "Pin 1 (NA)", "Pin 0 (NA)" };
+
+                    for (int i = 11; i > -1; i--)
+                    {
+                        mainDisplay.Text += pinInfo[i];
+                        if (IsBitSet((byte)endianCorrectedByte, i))
+                        {
+                            mainDisplay.Text += " after power on is set to HIGH.\n";
+                            
+                        }
+                        else
+                        {
+                            mainDisplay.Text += " after power on is set to LOW. \n";
+                        }
+                    }
+                }
+               
+
+                valueString += "\n";
+                mainDisplay.Text += valueString;
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 100;
+                break;
+            
         }
         captureStream = false;
 
     }
 
-    private void isItGetOrSet(string valueString, out string displayResponse, out int replySwitchInt)
+    private void isItGetOrSet(string valueString, out string displayResponse, out int replySwitchInt, out bool isSet)
     {
         if (valueString.Contains("OK+Get:"))
         {
             valueString = valueString.Replace("OK+Get:", "");
             displayResponse = "Got response: ";
+            isSet = false;
         }
         else if (valueString.Contains("OK+Set:"))
         {
             valueString = valueString.Replace("OK+Set:", "");
             displayResponse = "Set to: ";
+            isSet = true;
         } else
         {
             displayResponse = "ERROR ";
+            isSet = false;
         }
 
         try {replySwitchInt = Convert.ToInt32(valueString); } catch { replySwitchInt = 0 ;}
 
+    }
+
+    private void isItGetOrSetSAndByte(string valueString, out string displayResponse, out byte replyByte, out UInt16 endianCorrectByte, out bool isSet)
+    {
+        if (valueString.Contains("OK+Get:"))
+        {
+            valueString = valueString.Replace("OK+Get:", "0");
+            displayResponse = "Got response: ";
+            isSet = false;
+        }
+        else if (valueString.Contains("OK+Set:"))
+        {
+            valueString = valueString.Replace("OK+Set:", "0");
+            displayResponse = "Set to: ";
+            isSet = true;
+        }
+        else
+        {
+            isSet = false;
+            displayResponse = "ERROR ";
+        }
+
+        replyByte = 0;
+        byte[] byteArray = StringToByteArrayFastest(valueString);
+        if (BitConverter.IsLittleEndian) { Array.Reverse(byteArray); }
+        try { endianCorrectByte = System.BitConverter.ToUInt16(byteArray, 0); } catch { endianCorrectByte = 0x00; }
+    }
+
+    bool IsBitSet(byte b, int pos)
+    {
+        return (b & (1 << pos)) != 0;
+    }
+
+    public UInt16 ReadMemory16(Byte[] memory, UInt16 address)
+    {
+        return System.BitConverter.ToUInt16(memory, address);
     }
 
     private int convertStringToIntForHM1XSwitch(string valueString)
@@ -884,7 +981,7 @@ class SerialPortsExtended: SerialPort
         captureStream = true;
         WriteData("AT"); // Command to get version info.
         waitingOn = hm1xConstants.hm1xEnumCommands.CheckStatus;
-        HM1XCallbackSetTimer(200); // Wait half a second for reply.
+        HM1XCallbackSetTimer(300); // Wait half a second for reply.
         SerialSystemUpdateHandler(this, "", 50, Color.LimeGreen);
     }
 

@@ -135,7 +135,8 @@ namespace HM_1X_Aid_v01
                     break;
                 //"AT+ADC"
                 case hm1xConstants.hm1xEnumCommands.ADC:
-                    if(deviceType == hm1xConstants.hm1xDeviceType.HM10){
+                    if (deviceType == hm1xConstants.hm1xDeviceType.HM10)
+                    {
                         settingsExplained.Items.Add("Pin 4");
                         atCommandList.Add("4?");
                         settingsExplained.Items.Add("Pin 5");
@@ -153,7 +154,8 @@ namespace HM_1X_Aid_v01
                         settingsExplained.Items.Add("Pin B");
                         atCommandList.Add("B?");
                         settingsExplained.Enabled = true;
-                    } else
+                    }
+                    else
                     {
                         atCommandList.Add("");
                         settingsExplained.Items.Add(deviceType.ToString() + " does not support this feature.");
@@ -260,11 +262,18 @@ namespace HM_1X_Aid_v01
                     settingsExplained.Items.Add("Set Whitelist MAC Address 2");
                     atCommandList.Add("3");
                     settingsExplained.Items.Add("Set Whitelist MAC Address 2");
-
                     settingsExplained.Enabled = true;
                     settingsExplained.SelectedIndex = 0;
                     break;
                 //"AT+BEFC"
+                case hm1xConstants.hm1xEnumCommands.PIOStateAfterPowerOn:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get PIO State After Powered");
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Set PIO After Powered");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+AFTC"
                 //"AT+BATC"
                 //"AT+BATT",
@@ -347,10 +356,11 @@ namespace HM_1X_Aid_v01
 
         public void adjustParametersAndOtherSettings(hm1xConstants.hm1xEnumCommands enumeratedSelection, int settingsSelection, TextBox parameterOne, TextBox parameterTwo)
         {
+
             switch (enumeratedSelection)
             {
                 case hm1xConstants.hm1xEnumCommands.WhitelistMACAddress:
-                    if(settingsSelection > 2)
+                    if (settingsSelection > 2)
                     {
                         int macAddressCharCount = parameterOne.Text.Count();
                         if (macAddressCharCount < 12)
@@ -360,12 +370,43 @@ namespace HM_1X_Aid_v01
                                 parameterOne.Text += "0";
                             }
                         }
-                        else if (macAddressCharCount > 12){
+                        else if (macAddressCharCount > 12)
+                        {
                             Console.WriteLine(macAddressCharCount);
                             Console.WriteLine(macAddressCharCount - 12);
-                            parameterOne.Text = parameterOne.Text.Remove(12, macAddressCharCount-12);
+                            parameterOne.Text = parameterOne.Text.Remove(12, macAddressCharCount - 12);
                         }
-                    } else
+                    }
+                    else
+                    {
+                        // Must clear the parameter box or it will intefer with other commands.S
+                        parameterOne.Text = "";
+                    }
+                    break;
+                case hm1xConstants.hm1xEnumCommands.PIOStateAfterPowerOn:
+                    if (settingsSelection > 0)
+                    {
+                        int numberOfBits = parameterOne.Text.Count();
+                        if (numberOfBits < 13)
+                        {
+                            for (int i = 0; i < (12 - numberOfBits); i++)
+                            {
+                                parameterOne.Text += "0";
+                            }
+                        }
+                        else if (numberOfBits > 12)
+                        {
+                            Console.WriteLine(numberOfBits);
+                            Console.WriteLine(numberOfBits - 12);
+                            parameterOne.Text = parameterOne.Text.Remove(12, numberOfBits - 12);
+                        }
+                        parameterOne.Text = BinaryStringToHexString(parameterOne.Text);
+                        Console.WriteLine(parameterOne.Text);
+                        // Remove the upper nibble.
+                        parameterOne.Text = parameterOne.Text.Remove(0, 1);
+                        Console.WriteLine(parameterOne.Text);
+                    }
+                    else
                     {
                         // Must clear the parameter box or it will intefer with other commands.S
                         parameterOne.Text = "";
@@ -373,6 +414,32 @@ namespace HM_1X_Aid_v01
                     break;
             }
         }
-    }
-    
-}
+
+
+        // Borrowed from SO.
+        // http://stackoverflow.com/questions/5612306/converting-long-string-of-binary-to-hex-c-sharp
+        public static string BinaryStringToHexString(string binary)
+        {
+            StringBuilder result = new StringBuilder(binary.Length / 8 + 1);
+
+            // TODO: check all 1's or 0's... Will throw otherwise
+
+            int mod4Len = binary.Length % 8;
+            if (mod4Len != 0)
+            {
+                // pad to length multiple of 8
+                binary = binary.PadLeft(((binary.Length / 8) + 1) * 8, '0');
+            }
+
+            for (int i = 0; i < binary.Length; i += 8)
+            {
+                string eightBits = binary.Substring(i, 8);
+                result.AppendFormat("{0:X2}", Convert.ToByte(eightBits, 2));
+            }
+
+            return result.ToString();
+        }
+
+    } // End hm1xSettings
+
+} // End Namespace
