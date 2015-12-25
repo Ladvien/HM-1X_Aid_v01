@@ -142,5 +142,29 @@ namespace HM_1X_Aid_v01.Properties {
                 this["moduleType"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int bottomAreaTab {
+            get {
+                return ((int)(this["bottomAreaTab"]));
+            }
+            set {
+                this["bottomAreaTab"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int hm1xCommand {
+            get {
+                return ((int)(this["hm1xCommand"]));
+            }
+            set {
+                this["hm1xCommand"] = value;
+            }
+        }
     }
 }

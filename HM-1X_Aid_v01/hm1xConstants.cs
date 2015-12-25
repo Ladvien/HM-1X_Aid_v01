@@ -21,7 +21,7 @@ namespace HM_1X_Aid_v01
 
         public enum hm1xEnumCommands : int
         {
-            None = 0, CheckStatus, ADC, MACAddress, AdvertizingInterval, AdvertizingType, ANCS, Whitelist, WhitelistMACAddress, PIOStateAfterPowerOn, PIOStateAfterConnection,
+            None = 0, CheckStatus, ADC, MACAddress, AdvertizingInterval, AdvertizingType, ANCS, WhiteListSwitch, WhitelistMACAddress, PIOStateAfterPowerOn, PIOStateAfterConnection,
             BatteryMonitor, BatteryInformation, BitFormat, BaudRate, MinLinkLayerInterval, MaxLinkLayerInterval, LinkLayerSlaveLatency, UpdateConnectionParameter, Characteristic,
             ClearLastConnected, TryLastConnected, TryConnectionAddress, PIOState, PIOCollectionRate, StartDiscovery, StartiBeaconDiscovery, ConnectToDiscoveredDevice, iBeaconMode, RemoveBondInfo,
             AdvertizingFlag, HM1XConnectionFilter, FlowControlSwitch, RXGain, Help, WorkType, iBeaconModeSwitch, iBeaconUUID0, iBeaconUUID1, iBeaconUUID2, iBeaconUUID3,
@@ -114,143 +114,265 @@ namespace HM_1X_Aid_v01
 
     public class hm1xSettings
     {
-        public void getSettingsHM10(ComboBox comboBox, List<string> settings, hm1xConstants.hm1xEnumCommands command)
+        public void getSettingsHM10(ComboBox settingsExplained, List<string> atCommandList, hm1xConstants.hm1xEnumCommands command,
+            TextBox parameterOne, TextBox parameterTwo, Label parameterOneLbl, Label parameterTwoLbl, hm1xConstants.hm1xDeviceType deviceType, Button confirmButton)
         {
+
+            // Make sure we reset the confirm button to be enabled.
+            confirmButton.Enabled = true;
+            // Make sure previous settings for the combo box are cleared.
+            settingsExplained.Items.Clear();
+
             switch (command)
             {
                 //"AT"
                 case hm1xConstants.hm1xEnumCommands.CheckStatus:
-                    comboBox.Enabled = false;
+                    settingsExplained.Enabled = false;
                     break;
                 //"None"
                 case hm1xConstants.hm1xEnumCommands.None:
-                    comboBox.Enabled = false;
+                    settingsExplained.Enabled = false;
                     break;
                 //"AT+ADC"
                 case hm1xConstants.hm1xEnumCommands.ADC:
-                    settings.Add("Pin 4");
-                    comboBox.Items.Add("4?");
-                    settings.Add("Pin 5");
-                    comboBox.Items.Add("5?");
-                    settings.Add("Pin 6");
-                    comboBox.Items.Add("6?");
-                    settings.Add("Pin 7");
-                    comboBox.Items.Add("7?");
-                    settings.Add("Pin 8");
-                    comboBox.Items.Add("8?");
-                    settings.Add("Pin 9");
-                    comboBox.Items.Add("9?");
-                    settings.Add("Pin A");
-                    comboBox.Items.Add("A?");
-                    settings.Add("Pin B");
-                    comboBox.Items.Add("B?");
-                    comboBox.Enabled = true;
-                    comboBox.SelectedIndex = 0;
+                    if(deviceType == hm1xConstants.hm1xDeviceType.HM10){
+                        settingsExplained.Items.Add("Pin 4");
+                        atCommandList.Add("4?");
+                        settingsExplained.Items.Add("Pin 5");
+                        atCommandList.Add("5?");
+                        settingsExplained.Items.Add("Pin 6");
+                        atCommandList.Add("6?");
+                        settingsExplained.Items.Add("Pin 7");
+                        atCommandList.Add("7?");
+                        settingsExplained.Items.Add("Pin 8");
+                        atCommandList.Add("8?");
+                        settingsExplained.Items.Add("Pin 9");
+                        atCommandList.Add("9?");
+                        settingsExplained.Items.Add("Pin A");
+                        atCommandList.Add("A?");
+                        settingsExplained.Items.Add("Pin B");
+                        atCommandList.Add("B?");
+                        settingsExplained.Enabled = true;
+                    } else
+                    {
+                        atCommandList.Add("");
+                        settingsExplained.Items.Add(deviceType.ToString() + " does not support this feature.");
+                        confirmButton.Enabled = false;
+                        settingsExplained.Enabled = false;
+                    }
+                    settingsExplained.SelectedIndex = 0;
                     break;
-                case hm1xConstants.hm1xEnumCommands.Version:
-                    comboBox.Items.Add("?");
-                    comboBox.Enabled = true;
-                    comboBox.SelectedIndex = 0;
+                //"AT+ADDR"
+                case hm1xConstants.hm1xEnumCommands.MACAddress:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get this device's MAC Address");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
                     break;
-               case hm1xConstants.hm1xEnumCommands.LastConnectedAddress:
-                    comboBox.Items.Add("?");
-                    comboBox.Enabled = true;
-                    comboBox.SelectedIndex = 0;
-                    break;
+                //"AT+ADVI"
                 case hm1xConstants.hm1xEnumCommands.AdvertizingInterval:
-                    comboBox.Items.Add("?");
-                    comboBox.Items.Add("0");
-                    comboBox.Items.Add("1");
-                    comboBox.Items.Add("2");
-                    comboBox.Items.Add("3");
-                    comboBox.Items.Add("4");
-                    comboBox.Items.Add("5");
-                    comboBox.Items.Add("6");
-                    comboBox.Items.Add("7");
-                    comboBox.Items.Add("8");
-                    comboBox.Items.Add("9");
-                    comboBox.Enabled = true;
-                    comboBox.SelectedIndex = 0;
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Status");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("100.00ms");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("152.50ms");
+                    atCommandList.Add("2");
+                    settingsExplained.Items.Add("211.25");
+                    atCommandList.Add("3");
+                    settingsExplained.Items.Add("318.75ms");
+                    atCommandList.Add("4");
+                    settingsExplained.Items.Add("417.50ms");
+                    atCommandList.Add("5");
+                    settingsExplained.Items.Add("546.25ms");
+                    atCommandList.Add("6");
+                    settingsExplained.Items.Add("760.00ms");
+                    atCommandList.Add("7");
+                    settingsExplained.Items.Add("852.50s");
+                    atCommandList.Add("8");
+                    settingsExplained.Items.Add("1022.50ms");
+                    atCommandList.Add("8");
+                    settingsExplained.Items.Add("1285.00ms");
+                    atCommandList.Add("9");
+                    settingsExplained.Items.Add("2000.00ms");
+                    atCommandList.Add("A");
+                    settingsExplained.Items.Add("3000.00ms");
+                    atCommandList.Add("B");
+                    settingsExplained.Items.Add("4000.00ms");
+                    atCommandList.Add("C");
+                    settingsExplained.Items.Add("5000.00ms");
+                    atCommandList.Add("D");
+                    settingsExplained.Items.Add("6000.00ms");
+                    atCommandList.Add("E");
+                    settingsExplained.Items.Add("7000.00ms");
+                    atCommandList.Add("F");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
                     break;
-      
+                //"AT+ADTY"
+                case hm1xConstants.hm1xEnumCommands.AdvertizingType:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Status");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Advertising, Scan-Response, Connectable");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Only permit last device within 1.28 seconds");
+                    atCommandList.Add("2");
+                    settingsExplained.Items.Add("Allow advertizing and Scan-Response");
+                    atCommandList.Add("3");
+                    settingsExplained.Items.Add("Only allow advertizing");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
+                //"AT+ANCS"
+                case hm1xConstants.hm1xEnumCommands.ANCS:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Status");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Turn ANCS Off");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Turn ANCS On");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
+                //"AT+ALLO"
+                case hm1xConstants.hm1xEnumCommands.WhiteListSwitch:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Status");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Turn OFF Whitelist");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Turn ON Whitelist");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
+                //"AT+AD"
+                case hm1xConstants.hm1xEnumCommands.WhitelistMACAddress:
+                    atCommandList.Add("1??");
+                    settingsExplained.Items.Add("Get Status Address 1");
+                    atCommandList.Add("2??");
+                    settingsExplained.Items.Add("Get Status Address 2");
+                    atCommandList.Add("3??");
+                    settingsExplained.Items.Add("Get Status Address 3");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set Whitelist MAC Address 1");
+                    atCommandList.Add("2");
+                    settingsExplained.Items.Add("Set Whitelist MAC Address 2");
+                    atCommandList.Add("3");
+                    settingsExplained.Items.Add("Set Whitelist MAC Address 2");
 
-
-            //"AT+ADDR"
-            //"AT+ADVI"
-            //"AT+ADTY"
-            //"AT+ANCS"
-            //"AT+ALLO"
-            //"AT+AD"
-            //"AT+BEFC"
-            //"AT+AFTC"
-            //"AT+BATC"
-            //"AT+BATT",
-            //"AT+BIT",
-            //"AT+BAUD",
-            //"AT+COMI",
-            //"AT+COMA",
-            //"AT+COLA",
-            //"AT+COUP",
-            //"AT+CHAR", 
-            //"AT+CLEAR",
-            //"AT+CONL",
-            //"AT+CO",
-            //"AT+COL",
-            //"AT+CYC", 
-            //"AT+DISC", 
-            //"AT+DISI", 
-            //"AT+CONN", 
-            //"AT+DELO", 
-            //"AT+ERASE", 
-            //"AT+FLAG", 
-            //"AT+FILT", 
-            //"AT+FIOW", 
-            //"AT+GAIN",
-            //"AT+HELP
-            //"AT+IMME
-            //"AT+IBEA
-            //"AT+BEA0
-            //"AT+BEA1
-            //"AT+BEA2
-            //"AT+BEA3
-            //"AT+MARJ
-            //"AT+MINO
-            //"AT+MEAS
-            //"AT+MODE
-            //"AT+NOTI
-            //"AT+NOTP
-            //"AT+NAME
-            //"AT+PCTL
-            //"AT+PARI
-            //"AT+PIO
-            //"AT+PASS
-            //"AT+PIN
-            //"AT+POWE
-            //"AT+PWRM
-            //"AT+RELI
-            //"AT+RENEW
-            //"AT+RESTART
-            //"AT+ROLE
-            //"AT+RSSI
-            //"AT+RADD
-            //"AT+RAT
-            //"AT+STOP
-            //"AT+START
-            //"AT+SLEEP
-            //"AT+SAVE
-            //"AT+SENS
-            //"AT+SHOW
-            //"AT+TEHU
-            //"AT+TEMP
-            //"AT+TCON
-            //"AT+TYPE
-            //"AT+UUID
-            //"AT+UART
-            //"AT+VERS"
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
+                //"AT+BEFC"
+                //"AT+AFTC"
+                //"AT+BATC"
+                //"AT+BATT",
+                //"AT+BIT",
+                //"AT+BAUD",
+                //"AT+COMI",
+                //"AT+COMA",
+                //"AT+COLA",
+                //"AT+COUP",
+                //"AT+CHAR", 
+                //"AT+CLEAR",
+                //"AT+CONL",
+                //"AT+CO",
+                //"AT+COL",
+                //"AT+CYC", 
+                //"AT+DISC", 
+                //"AT+DISI", 
+                //"AT+CONN", 
+                //"AT+DELO", 
+                //"AT+ERASE", 
+                //"AT+FLAG", 
+                //"AT+FILT", 
+                //"AT+FIOW", 
+                //"AT+GAIN",
+                //"AT+HELP
+                //"AT+IMME
+                //"AT+IBEA
+                //"AT+BEA0
+                //"AT+BEA1
+                //"AT+BEA2
+                //"AT+BEA3
+                //"AT+MARJ
+                //"AT+MINO
+                //"AT+MEAS
+                //"AT+MODE
+                //"AT+NOTI
+                //"AT+NOTP
+                //"AT+NAME
+                //"AT+PCTL
+                //"AT+PARI
+                //"AT+PIO
+                //"AT+PASS
+                //"AT+PIN
+                //"AT+POWE
+                //"AT+PWRM
+                //"AT+RELI
+                //"AT+RENEW
+                //"AT+RESTART
+                //"AT+ROLE
+                //"AT+RSSI
+                //"AT+RADD
+                case hm1xConstants.hm1xEnumCommands.LastConnectedAddress:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get MAC Address of Last Connected Device");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
+                //"AT+RAT
+                //"AT+STOP
+                //"AT+START
+                //"AT+SLEEP
+                //"AT+SAVE
+                //"AT+SENS
+                //"AT+SHOW
+                //"AT+TEHU
+                //"AT+TEMP
+                //"AT+TCON
+                //"AT+TYPE
+                //"AT+UUID
+                //"AT+UART
+                //"AT+VERS"
+                case hm1xConstants.hm1xEnumCommands.Version:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Version");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
+            }
         }
-        }
-        
 
+        public void adjustParametersAndOtherSettings(hm1xConstants.hm1xEnumCommands enumeratedSelection, int settingsSelection, TextBox parameterOne, TextBox parameterTwo)
+        {
+            switch (enumeratedSelection)
+            {
+                case hm1xConstants.hm1xEnumCommands.WhitelistMACAddress:
+                    if(settingsSelection > 2)
+                    {
+                        int macAddressCharCount = parameterOne.Text.Count();
+                        if (macAddressCharCount < 12)
+                        {
+                            for (int i = 0; i < (12 - macAddressCharCount); i++)
+                            {
+                                parameterOne.Text += "0";
+                            }
+                        }
+                        else if (macAddressCharCount > 12){
+                            Console.WriteLine(macAddressCharCount);
+                            Console.WriteLine(macAddressCharCount - 12);
+                            parameterOne.Text = parameterOne.Text.Remove(12, macAddressCharCount-12);
+                        }
+                    } else
+                    {
+                        // Must clear the parameter box or it will intefer with other commands.S
+                        parameterOne.Text = "";
+                    }
+                    break;
+            }
+        }
     }
-
+    
 }

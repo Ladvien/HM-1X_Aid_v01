@@ -34,10 +34,6 @@ class SerialPortsExtended: SerialPort
 
     enum charsAfterRXTX : int { None = 0, LineFeed, CarriageReturn, CarriageReturnLineFeed, LineFeedCarriageReturn };
     
-
-    
-
-    
     // Open port flag.
     private bool portOpen = false;
 
@@ -85,6 +81,8 @@ class SerialPortsExtended: SerialPort
     // Received data buffer.
     private string InputData = string.Empty;
 
+    // Settings AT suffix.
+    List<string> atCommandSuffixList = new List<string>();
 
     public void initDictionary()
     {
@@ -544,35 +542,46 @@ class SerialPortsExtended: SerialPort
     // 4. Set onWaiting to what command is being waited on.
     // 5. Set timer.
     // 6. When HM1X sends response analyze it for validity.
-    //    OR when timer expires, decide if we got a valid response.
+    //    OR when timer expires, decide if we got a valid response.S
     // 7. If no valid response was obtained, sned last command.
     // 8. Repeat 7. until timeout or valid response.
     // 9. Set appropriate variable based upon response.
     // 10. Release stream.
 
-    public void sendCommandToHM1X(ComboBox commandComboBox, ComboBox settingsComboBox, TextBox sendTextBox, TextBox sysLogTextBox, ProgressBar progressBar)
+    public void sendCommandToHM1X(ComboBox commandComboBox, ComboBox settingsComboBox, TextBox parameterOne, 
+        TextBox parameterTwo, TextBox sysLogTextBox, ProgressBar progressBar, Button confirmButton)
     {
         captureStream = true;
 
         string finalCommand = "";
         string command = "";
         string settings = "";
-        string textBox = "";
+        string parameterOneStr = "";
+        string parameterTwoStr = "";
 
         SerialSystemUpdateHandler(this, "Executing " + commandComboBox.Text + settingsComboBox.Text + "\n", 50, Color.LimeGreen);
+
+        hm1xConstants.hm1xEnumCommands commandComboBoxSelectedIndexAsEnum = (hm1xConstants.hm1xEnumCommands)commandComboBox.SelectedIndex;
+        waitingOn = commandComboBoxSelectedIndexAsEnum;
+        hm1xSettings.adjustParametersAndOtherSettings(commandComboBoxSelectedIndexAsEnum, settingsComboBox.SelectedIndex, parameterOne, parameterTwo);
 
         if (commandComboBox.Items.Count > 0)
         {
             command = hm1xConstants.hm1xCommandsString[commandComboBox.SelectedIndex];
         }
-        if (settingsComboBox.Items.Count > 0)
+        if (atCommandSuffixList.Count > 0)
         {
-            settings = settingsComboBox.SelectedItem.ToString();
+            settings = atCommandSuffixList[settingsComboBox.SelectedIndex];
         }
-        if (sendTextBox.Text != "")
+        if (parameterOne.Text != "")
         {
-            textBox = sendTextBox.Text;
+            parameterOneStr = parameterOne.Text;
         }
+        if (parameterTwo.Text != "")
+        {
+           parameterTwoStr = parameterTwo.Text;
+        }
+
         if (command != "")
         {
             finalCommand += command;
@@ -581,18 +590,21 @@ class SerialPortsExtended: SerialPort
         {
             finalCommand += settings;
         }
-        if (textBox != "")
+        if (parameterOneStr != "")
         {
-            finalCommand += textBox;
+            finalCommand += parameterOneStr;
+        }
+        if (parameterTwoStr != "")
+        {
+            finalCommand += parameterTwoStr;
         }
 
         if (finalCommand != "")
         {
             WriteData(finalCommand);
         }
-        hm1xConstants.hm1xEnumCommands commandComboBoxSelectedIndexAsEnum = (hm1xConstants.hm1xEnumCommands)commandComboBox.SelectedIndex;
-        waitingOn = commandComboBoxSelectedIndexAsEnum;
-        HM1XCallbackSetTimer(200); // Wait half a second for reply.
+
+        HM1XCallbackSetTimer(250); // Wait half a second for reply.
         SerialSystemUpdateHandler(this, "", 50, Color.LimeGreen);
     }
 
@@ -610,34 +622,9 @@ class SerialPortsExtended: SerialPort
     private void hm1xCommandTimedCallback(Object source, EventArgs e)
     {
         if(captureBuffer != "") {
-            switch (waitingOn)
-            {
-                case hm1xConstants.hm1xEnumCommands.None:
-                    HM1XupdatedHandler(this, waitingOn, captureBuffer);
-                    break;
-                case hm1xConstants.hm1xEnumCommands.Version:
-                    setVersion();
-                    HM1XupdatedHandler(this, waitingOn, captureBuffer);
-                    waitingOn = hm1xConstants.hm1xEnumCommands.None;
-                    break;
-                case hm1xConstants.hm1xEnumCommands.CheckStatus:
-                    setHM1XConnection();
-                    HM1XupdatedHandler(this, waitingOn, captureBuffer);
-                    waitingOn = hm1xConstants.hm1xEnumCommands.None;
-                    break;
-                case hm1xConstants.hm1xEnumCommands.ADC:
-                    HM1XupdatedHandler(this, waitingOn, captureBuffer);
-                    waitingOn = hm1xConstants.hm1xEnumCommands.None;
-                    break;
-                case hm1xConstants.hm1xEnumCommands.MACAddress:
-                    HM1XupdatedHandler(this, waitingOn, captureBuffer);
-                    waitingOn = hm1xConstants.hm1xEnumCommands.None;
-                    break;
-                case hm1xConstants.hm1xEnumCommands.AdvertizingInterval:
-                    HM1XupdatedHandler(this, waitingOn, captureBuffer);
-                    waitingOn = hm1xConstants.hm1xEnumCommands.None;
-                    break;
-            }
+            HM1XupdatedHandler(this, waitingOn, captureBuffer);
+            waitingOn = hm1xConstants.hm1xEnumCommands.None;
+            captureBuffer = "";
         } else {
             // ERROR HANDLE NO REPLY.
         }       
@@ -658,22 +645,28 @@ class SerialPortsExtended: SerialPort
         hm1xConstants.hm1xEnumCommands switchValue = (hm1xConstants.hm1xEnumCommands)originator;
         switch (switchValue)
         {
-            case hm1xConstants.hm1xEnumCommands.None:
-                //SerialSystemUpdateHandler(this, "Error" + hm1xConstants.hm1xEnumCommands.Version.ToString(), 100, Color.Crimson);
-                break;
             case hm1xConstants.hm1xEnumCommands.CheckStatus:
-                // ADD LATER.
+                setHM1XConnection();
                 break;
             case hm1xConstants.hm1xEnumCommands.Version:
-              //  SerialSystemUpdateHandler(this, "Completed " + hm1xConstants.hm1xEnumCommands.Version.ToString(), 100, Color.LimeGreen);
+                break;
+            case hm1xConstants.hm1xEnumCommands.ADC:
+                break;
+            case hm1xConstants.hm1xEnumCommands.MACAddress:
+                break;
+            case hm1xConstants.hm1xEnumCommands.AdvertizingInterval:
+                break;
+            case hm1xConstants.hm1xEnumCommands.LastConnectedAddress:
                 break;
         }
     }
 
     public void updateUIAfterDataRX(object sender, object originator, object value, RichTextBox mainDisplay, TextBox sysTextBox, ProgressBar progressBar, Label label)
     {
-
+        // Response builder.
+        string getOrSet = "";
         String valueString = (string)value;
+        int replySwitch = 0;
 
         hm1xConstants.hm1xEnumCommands switchValue = (hm1xConstants.hm1xEnumCommands)originator;
         switch (switchValue)
@@ -683,17 +676,19 @@ class SerialPortsExtended: SerialPort
                 label.BackColor = Color.LimeGreen;
                 progressBar.BackColor = Color.LimeGreen;
                 progressBar.Value = 100;
+                mainDisplay.Text += "Connected\n";
                 setHM1XConnection();
                 break;
             case hm1xConstants.hm1xEnumCommands.Version:
                 progressBar.BackColor = Color.LimeGreen;
                 progressBar.Value = 100;
+                sysTextBox.Text += "Got VERS";
                 mainDisplay.Text += "Firmware version: " + value.ToString() +"\n";
                 break;
             case hm1xConstants.hm1xEnumCommands.ADC:
                 progressBar.BackColor = Color.LimeGreen;
                 progressBar.Value = 100;
-                sysTextBox.Text += "Got ADC Value.\n";
+                sysTextBox.Text += "Got ADC.\n";
                 valueString = valueString.Replace("OK+ADC", "PIO #");
                 valueString += "\n";
                 mainDisplay.Text += valueString;
@@ -709,7 +704,7 @@ class SerialPortsExtended: SerialPort
             case hm1xConstants.hm1xEnumCommands.AdvertizingInterval:
                 progressBar.BackColor = Color.LimeGreen;
                 progressBar.Value = 100;
-                sysTextBox.Text += "Got Advertizing.\n";
+                sysTextBox.Text += "Got ADVI.\n";
                 if (valueString.Contains("OK+Get:"))
                 {
                     valueString = valueString.Replace("OK+Get:", "Got Advertizing interval: ");
@@ -717,11 +712,163 @@ class SerialPortsExtended: SerialPort
                 {
                     valueString = valueString.Replace("OK+Set:", "Set advertizing interval: ");
                 }
-                
                 valueString += "\n";
                 mainDisplay.Text += valueString;
                 break;
+            case hm1xConstants.hm1xEnumCommands.AdvertizingType:
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 100;
+                sysTextBox.Text += "Got ADTY.\n";
+                
+                if (valueString.Contains("OK+Get:"))
+                {
+                    valueString = valueString.Replace("OK+Get: ", "");
+                    getOrSet = "Got response: ";
+                }
+                else if(valueString.Contains("OK+Set:"))
+                {
+                    valueString = valueString.Replace("OK+Set:", "");
+                    getOrSet = "Set to: ";
+                }
+
+                try { replySwitch = Convert.ToInt32(valueString); } catch {; }
+                valueString = getOrSet;
+
+                switch (replySwitch)
+                {
+                    case 0:
+                        valueString += "Advertising, Scan-Response, Connectable";
+                        break;
+                    case 1:
+                        valueString += "Only permit last device within 1.28 seconds";
+                        break;
+                    case 2:
+                        valueString += "Allow advertizing and Scan-Response";
+                        break;
+                    case 3:
+                        valueString += "Allow advertizing and Scan-Response";
+                        break;
+                }
+                valueString += "\n";
+                mainDisplay.Text += valueString;
+                break;
+            case hm1xConstants.hm1xEnumCommands.ANCS:
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 75;
+                sysTextBox.Text += "Got ANCS.\n";
+
+                isItGetOrSet(valueString, out getOrSet, out replySwitch);
+
+                valueString = getOrSet;
+
+                switch (replySwitch)
+                {
+                    case 0:
+                        valueString += " ANCS is Off";
+                        break;
+                    case 1:
+                        valueString += " ANCS is On  -- the module must be reset for this to go into effect \n";
+                        valueString += "and the bond mode must be set to \"Authorize and Bond.\"";
+                        break;
+                }
+                valueString += "\n";
+                mainDisplay.Text += valueString;
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 100;
+                break;
+            case hm1xConstants.hm1xEnumCommands.LastConnectedAddress:
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 100;
+                sysTextBox.Text += "Got Last Connected Address.\n";
+                if (valueString.Contains("OK+RADD:"))
+                {
+                    valueString = valueString.Replace("OK+RADD:", "Got MAC address of last connected device: ");
+                } else {
+                    // Error
+                }  
+                valueString += "\n";
+                mainDisplay.Text += valueString;
+                break;
+            case hm1xConstants.hm1xEnumCommands.WhiteListSwitch:
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 75;
+                sysTextBox.Text += "Got ALLO.\n";
+
+                isItGetOrSet(valueString, out getOrSet, out replySwitch);
+
+                valueString = getOrSet;
+
+                switch (replySwitch)
+                {
+                    case 0:
+                        valueString += " Whitelist Switch is OFF";
+                        break;
+                    case 1:
+                        valueString += " Whitelist Switch is ON";
+                        break;
+                }
+                valueString += "\n";
+                mainDisplay.Text += valueString;
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 100;
+                break;
+            case hm1xConstants.hm1xEnumCommands.WhitelistMACAddress:
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 75;
+                sysTextBox.Text += "Got AD.\n";
+
+                isItGetOrSet(valueString, out getOrSet, out replySwitch);
+
+                string macAddress = "";
+
+                if (valueString.Contains("OK+AD1?:"))
+                {
+                    macAddress = "Whitelist MAC 1: " + valueString.Replace("OK+AD1?:", "");
+                } else if (valueString.Contains("OK+AD2?:"))
+                {
+                    macAddress = "Whitelist MAC 2: " + valueString.Replace("OK+AD2?:", "");
+                } else if (valueString.Contains("OK+AD3?:"))
+                {
+                    macAddress = "Whitelist MAC 3: " + valueString.Replace("OK+AD3?:", "");
+                }
+
+                valueString = macAddress;
+                valueString += "\n";
+                mainDisplay.Text += valueString;
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 100;
+                break;
+
         }
+        captureStream = false;
+
+    }
+
+    private void isItGetOrSet(string valueString, out string displayResponse, out int replySwitchInt)
+    {
+        if (valueString.Contains("OK+Get:"))
+        {
+            valueString = valueString.Replace("OK+Get:", "");
+            displayResponse = "Got response: ";
+        }
+        else if (valueString.Contains("OK+Set:"))
+        {
+            valueString = valueString.Replace("OK+Set:", "");
+            displayResponse = "Set to: ";
+        } else
+        {
+            displayResponse = "ERROR ";
+        }
+
+        try {replySwitchInt = Convert.ToInt32(valueString); } catch { replySwitchInt = 0 ;}
+
+    }
+
+    private int convertStringToIntForHM1XSwitch(string valueString)
+    {
+        int value = 0;
+        try { value = Convert.ToInt32(valueString); } catch {; }
+        return value;
     }
 
     public void setModuleType(int type)
@@ -811,22 +958,27 @@ class SerialPortsExtended: SerialPort
 
 
 
-    public void addHM1XSettingsToComboBox(ComboBox comboBox, hm1xConstants.hm1xEnumCommands commandValue, TextBox sysLogTextBox)
+    public void addHM1XSettingsToComboBox(ComboBox settingsComboBox, hm1xConstants.hm1xEnumCommands commandValue, TextBox parameterOne, 
+        TextBox parameterTwo, Label parameterOneLbl, Label parameterTwoLbl, TextBox sysLogTextBox, Button confirmButton)
     {
         if (hm1xModuleType == hm1xConstants.hm1xDeviceType.Unknown)
         {
             sysLogTextBox.Text = "Please select module type.";
         }
         else
-        {
-            List<string> readableCommandsList = new List<string>();
-
+        {          
             // Fills a referenced combobox with HM1X settings.
-            hm1xSettings.getSettingsHM10(comboBox, readableCommandsList, commandValue);   
+            hm1xSettings.getSettingsHM10(settingsComboBox, atCommandSuffixList, commandValue, parameterOne, parameterTwo, parameterOneLbl, parameterTwoLbl, hm1xModuleType, confirmButton );   
         }
 
         // Default to 
         // comboBox.SelectedIndex = 0;
-}
+    }
+
+
+    public void clearSettingsList()
+    {
+        atCommandSuffixList.Clear();
+    }
     ///// HM-1X END/////////////////////////////////////////////////////////////////////////////////////
 }

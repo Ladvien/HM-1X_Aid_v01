@@ -70,6 +70,12 @@ namespace HM_1X_Aid_v01
             cmbCharAfterRx.SelectedIndex = Properties.Settings.Default.charsAfterRX;
             cmbCharsAfterTx.SelectedIndex = Properties.Settings.Default.charsAfterTX;
             cmbHM1XDeviceType.SelectedIndex = Properties.Settings.Default.moduleType;
+            tbcBottomPane.SelectedIndex = Properties.Settings.Default.bottomAreaTab;
+            if(cmbHM1XCommands.Items.Count > 0)
+            {
+                cmbHM1XCommands.SelectedIndex = Properties.Settings.Default.hm1xCommand;
+            }
+            
             serialSystemUpdate(this, "Loaded settings.\n", 100, Color.LimeGreen);
         }
 
@@ -86,6 +92,8 @@ namespace HM_1X_Aid_v01
             Properties.Settings.Default.charsAfterRX = cmbCharAfterRx.SelectedIndex;
             Properties.Settings.Default.charsAfterTX = cmbCharsAfterTx.SelectedIndex;
             Properties.Settings.Default.moduleType = cmbHM1XDeviceType.SelectedIndex;
+            Properties.Settings.Default.hm1xCommand = cmbHM1XCommands.SelectedIndex;
+            Properties.Settings.Default.bottomAreaTab = tbcBottomPane.SelectedIndex;
             Properties.Settings.Default.Save();
             serialSystemUpdate(this, "Saved settings.\n", 100, Color.LimeGreen);
         }
@@ -103,6 +111,7 @@ namespace HM_1X_Aid_v01
             Properties.Settings.Default.charsAfterRX = 0;
             Properties.Settings.Default.charsAfterTX = 0;
             Properties.Settings.Default.moduleType = 0;
+            Properties.Settings.Default.hm1xCommand = 0;
             Properties.Settings.Default.Save();
             serialSystemUpdate(this, "Cleared.\n", 100, Color.LimeGreen);
         }
@@ -126,7 +135,7 @@ namespace HM_1X_Aid_v01
         public void HM1XupdateValue(object sender, object originator, object value)
         {
             this.BeginInvoke(new HM1XVariableUpdate(updateHM1XVariables), new object[] { sender, originator, value });
-        }
+        } 
 
         public void updateHM1XVariables(object sender, object originator, object value)
         {
@@ -198,6 +207,7 @@ namespace HM_1X_Aid_v01
             cmbCharsAfterTx.Items.Add("CR LF");
             cmbCharsAfterTx.SelectedIndex = 1;
 
+
             // Get a list of COM ports.
             List<string> portList = serialPorts.getPortsList();
             portList.ForEach(delegate (String portInfo)
@@ -221,7 +231,15 @@ namespace HM_1X_Aid_v01
                 serialPorts.AddStopBitsToComboBox(cmbStopBitsPortSettingsTab, 0);
                 serialPorts.AddParityToComboBox(cmbParityPortSettingsTab, 0);
                 serialPorts.AddHandshakingToComboBox(cmbHandshakingPortSettingsTab, 0);
+
+                // Add commands to the combobox
+                serialPorts.addHM1XCommandsToComboBox(cmbHM1XCommands, 0);
+
                 loadSettings();
+                hm1xConstants.hm1xEnumCommands selectedEnumeration = (hm1xConstants.hm1xEnumCommands)cmbHM1XCommands.SelectedIndex;
+                Console.WriteLine(selectedEnumeration.ToString());
+                serialPorts.addHM1XSettingsToComboBox(cmbHM1XSettings, selectedEnumeration, txbParameterOne, txbParameterTwo, lblParameterOne, lblParameterTwo, txbSysMsg, btnConfirmHM1XSetting);
+
             }
             serialSystemUpdate(this, "Loaded COM info.\n", 100, Color.LimeGreen);
         }
@@ -231,8 +249,10 @@ namespace HM_1X_Aid_v01
             hm1xConstants.hm1xEnumCommands selectedEnumeration = (hm1xConstants.hm1xEnumCommands) cmbHM1XCommands.SelectedIndex;
             if (cmbHM1XCommands.Items.Count > 0)
             {
-                serialPorts.addHM1XSettingsToComboBox(cmbHM1XSettings, selectedEnumeration, txbSysMsg);
+                serialPorts.addHM1XSettingsToComboBox(cmbHM1XSettings, selectedEnumeration, txbParameterOne, txbParameterTwo, lblParameterOne, lblParameterTwo, txbSysMsg, btnConfirmHM1XSetting);
             }
+
+
              
         }
 
@@ -317,13 +337,12 @@ namespace HM_1X_Aid_v01
         private void addSysMsgText(string text)
         {
             txbSysMsg.AppendText(text);
-           // txbSysMsg.ScrollToCaret();
+            txbSysMsg.ScrollToCaret();
         }
 
         private void setSysMsgText(string text)
         {
             txbSysMsg.Text = text;
-            txbSysMsg.ScrollToCaret();
         }
 
 
@@ -485,7 +504,7 @@ namespace HM_1X_Aid_v01
 
         private void btnConfirmHM1XSetting_Click(object sender, EventArgs e)
         {
-            serialPorts.sendCommandToHM1X(cmbHM1XCommands, cmbHM1XSettings, txbSendTextBox, txbSysMsg, pbSysStatus);
+            serialPorts.sendCommandToHM1X(cmbHM1XCommands, cmbHM1XSettings, txbParameterOne, txbParameterTwo, txbSysMsg, pbSysStatus, btnConfirmHM1XSetting);
         }
 
         private void btnConnectHM1X_Click(object sender, EventArgs e)
@@ -495,7 +514,7 @@ namespace HM_1X_Aid_v01
             // 2. Get list of basic module info.
             // 3. Populate drop down with AT commands.
 
-            serialPorts.addHM1XCommandsToComboBox(cmbHM1XCommands, 0);
+
             toggleHM1XMenu(true);
             serialPorts.connectToHM1X();
 
@@ -505,6 +524,11 @@ namespace HM_1X_Aid_v01
         {
             ComboBox comboBox = (ComboBox)sender;
             serialPorts.setModuleType(comboBox.SelectedIndex);
+            hm1xConstants.hm1xEnumCommands selectedEnumeration = (hm1xConstants.hm1xEnumCommands)cmbHM1XCommands.SelectedIndex;
+            if (cmbHM1XCommands.Items.Count > 0)
+            {
+                serialPorts.addHM1XSettingsToComboBox(cmbHM1XSettings, selectedEnumeration, txbParameterOne, txbParameterTwo, lblParameterOne, lblParameterTwo, txbSysMsg, btnConfirmHM1XSetting);
+            }
         }
 
         private void btnClearSettings_Click(object sender, EventArgs e)
@@ -515,6 +539,32 @@ namespace HM_1X_Aid_v01
         private void cmbHM1XCommands_SelectedIndexChanged(object sender, EventArgs e)
         {
             cmbHM1XSettings.Items.Clear();
+            serialPorts.clearSettingsList();
+        }
+
+        private void cmbHM1XSettings_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //Make sure the parameter boxes and labels are hidden unless needed.
+            txbParameterOne.Visible = false;
+            txbParameterTwo.Visible = false;
+            lblParameterOne.Visible = false;
+            lblParameterTwo.Visible = false;
+            lblParameterOne.Text = "";
+            lblParameterTwo.Text = "";
+
+            hm1xConstants.hm1xEnumCommands selectedEnumeration = (hm1xConstants.hm1xEnumCommands) cmbHM1XCommands.SelectedIndex;
+            switch (selectedEnumeration)
+            {
+                case hm1xConstants.hm1xEnumCommands.WhitelistMACAddress:
+                    if (cmbHM1XSettings.SelectedIndex > 2)
+                    {
+                        txbParameterOne.Visible = true;
+                        lblParameterOne.Text = "MAC Address (12 digits)";
+                        lblParameterOne.Visible = true;
+
+                    }
+                    break;
+            }
         }
     }
 

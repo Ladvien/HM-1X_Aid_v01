@@ -65,7 +65,7 @@
             this.serialPortsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.defaultToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.tbcPortSettings = new System.Windows.Forms.TabControl();
+            this.tbcBottomPane = new System.Windows.Forms.TabControl();
             this.tabPortSettings = new System.Windows.Forms.TabPage();
             this.tloPortSettings = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
@@ -91,11 +91,15 @@
             this.tabHM1XSettings = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
+            this.lblParameterTwo = new System.Windows.Forms.Label();
+            this.lblParameterOne = new System.Windows.Forms.Label();
+            this.txbParameterTwo = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.cmbHM1XCommands = new System.Windows.Forms.ComboBox();
             this.cmbHM1XSettings = new System.Windows.Forms.ComboBox();
             this.btnConfirmHM1XSetting = new System.Windows.Forms.Button();
+            this.txbParameterOne = new System.Windows.Forms.TextBox();
             this.lblHM1XSettingInfo = new System.Windows.Forms.Label();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.btnSend = new System.Windows.Forms.Button();
@@ -118,7 +122,7 @@
             this.btnClearSettings = new System.Windows.Forms.Button();
             this.mnuMainMenu.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
-            this.tbcPortSettings.SuspendLayout();
+            this.tbcBottomPane.SuspendLayout();
             this.tabPortSettings.SuspendLayout();
             this.tloPortSettings.SuspendLayout();
             this.tabDataSettings.SuspendLayout();
@@ -398,7 +402,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.tbcPortSettings, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.tbcBottomPane, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel4, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.rtbMainDisplay, 0, 0);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(219, 52);
@@ -411,19 +415,19 @@
             this.tableLayoutPanel1.TabIndex = 4;
             this.tableLayoutPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel1_Paint_1);
             // 
-            // tbcPortSettings
+            // tbcBottomPane
             // 
-            this.tbcPortSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.tbcBottomPane.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbcPortSettings.Controls.Add(this.tabPortSettings);
-            this.tbcPortSettings.Controls.Add(this.tabDataSettings);
-            this.tbcPortSettings.Controls.Add(this.tabHM1XSettings);
-            this.tbcPortSettings.Location = new System.Drawing.Point(3, 464);
-            this.tbcPortSettings.Name = "tbcPortSettings";
-            this.tbcPortSettings.SelectedIndex = 0;
-            this.tbcPortSettings.Size = new System.Drawing.Size(963, 201);
-            this.tbcPortSettings.TabIndex = 1;
+            this.tbcBottomPane.Controls.Add(this.tabPortSettings);
+            this.tbcBottomPane.Controls.Add(this.tabDataSettings);
+            this.tbcBottomPane.Controls.Add(this.tabHM1XSettings);
+            this.tbcBottomPane.Location = new System.Drawing.Point(3, 464);
+            this.tbcBottomPane.Name = "tbcBottomPane";
+            this.tbcBottomPane.SelectedIndex = 0;
+            this.tbcBottomPane.Size = new System.Drawing.Size(963, 201);
+            this.tbcBottomPane.TabIndex = 1;
             // 
             // tabPortSettings
             // 
@@ -746,21 +750,58 @@
             this.tableLayoutPanel6.ColumnCount = 2;
             this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35.94771F));
             this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 64.05229F));
+            this.tableLayoutPanel6.Controls.Add(this.lblParameterTwo, 0, 4);
+            this.tableLayoutPanel6.Controls.Add(this.lblParameterOne, 0, 3);
+            this.tableLayoutPanel6.Controls.Add(this.txbParameterTwo, 1, 4);
             this.tableLayoutPanel6.Controls.Add(this.label9, 0, 0);
             this.tableLayoutPanel6.Controls.Add(this.label10, 0, 1);
             this.tableLayoutPanel6.Controls.Add(this.cmbHM1XCommands, 1, 0);
             this.tableLayoutPanel6.Controls.Add(this.cmbHM1XSettings, 1, 1);
             this.tableLayoutPanel6.Controls.Add(this.btnConfirmHM1XSetting, 1, 2);
+            this.tableLayoutPanel6.Controls.Add(this.txbParameterOne, 1, 3);
             this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel6.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel6.Name = "tableLayoutPanel6";
-            this.tableLayoutPanel6.RowCount = 4;
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 62F));
+            this.tableLayoutPanel6.RowCount = 5;
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel6.Size = new System.Drawing.Size(612, 162);
             this.tableLayoutPanel6.TabIndex = 0;
+            // 
+            // lblParameterTwo
+            // 
+            this.lblParameterTwo.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblParameterTwo.Location = new System.Drawing.Point(3, 128);
+            this.lblParameterTwo.Name = "lblParameterTwo";
+            this.lblParameterTwo.Size = new System.Drawing.Size(213, 34);
+            this.lblParameterTwo.TabIndex = 7;
+            this.lblParameterTwo.Text = "Parameter Two";
+            this.lblParameterTwo.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lblParameterTwo.Visible = false;
+            // 
+            // lblParameterOne
+            // 
+            this.lblParameterOne.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblParameterOne.Location = new System.Drawing.Point(3, 96);
+            this.lblParameterOne.Name = "lblParameterOne";
+            this.lblParameterOne.Size = new System.Drawing.Size(213, 32);
+            this.lblParameterOne.TabIndex = 6;
+            this.lblParameterOne.Text = "Parameter One";
+            this.lblParameterOne.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lblParameterOne.Visible = false;
+            // 
+            // txbParameterTwo
+            // 
+            this.txbParameterTwo.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txbParameterTwo.Location = new System.Drawing.Point(222, 131);
+            this.txbParameterTwo.Name = "txbParameterTwo";
+            this.txbParameterTwo.Size = new System.Drawing.Size(387, 26);
+            this.txbParameterTwo.TabIndex = 5;
+            this.txbParameterTwo.Visible = false;
             // 
             // label9
             // 
@@ -768,7 +809,7 @@
             this.label9.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label9.Location = new System.Drawing.Point(3, 0);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(213, 33);
+            this.label9.Size = new System.Drawing.Size(213, 32);
             this.label9.TabIndex = 0;
             this.label9.Text = "HM-1X Command";
             this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -776,9 +817,9 @@
             // label10
             // 
             this.label10.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label10.Location = new System.Drawing.Point(3, 33);
+            this.label10.Location = new System.Drawing.Point(3, 32);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(213, 33);
+            this.label10.Size = new System.Drawing.Size(213, 32);
             this.label10.TabIndex = 0;
             this.label10.Text = "Setting";
             this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -801,22 +842,32 @@
             this.cmbHM1XSettings.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbHM1XSettings.Enabled = false;
             this.cmbHM1XSettings.FormattingEnabled = true;
-            this.cmbHM1XSettings.Location = new System.Drawing.Point(222, 36);
+            this.cmbHM1XSettings.Location = new System.Drawing.Point(222, 35);
             this.cmbHM1XSettings.Name = "cmbHM1XSettings";
             this.cmbHM1XSettings.Size = new System.Drawing.Size(387, 28);
             this.cmbHM1XSettings.TabIndex = 2;
+            this.cmbHM1XSettings.SelectedIndexChanged += new System.EventHandler(this.cmbHM1XSettings_SelectedIndexChanged);
             // 
             // btnConfirmHM1XSetting
             // 
             this.btnConfirmHM1XSetting.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnConfirmHM1XSetting.Enabled = false;
-            this.btnConfirmHM1XSetting.Location = new System.Drawing.Point(222, 69);
+            this.btnConfirmHM1XSetting.Location = new System.Drawing.Point(222, 67);
             this.btnConfirmHM1XSetting.Name = "btnConfirmHM1XSetting";
-            this.btnConfirmHM1XSetting.Size = new System.Drawing.Size(387, 27);
+            this.btnConfirmHM1XSetting.Size = new System.Drawing.Size(387, 26);
             this.btnConfirmHM1XSetting.TabIndex = 3;
             this.btnConfirmHM1XSetting.Text = "Confirm";
             this.btnConfirmHM1XSetting.UseVisualStyleBackColor = true;
             this.btnConfirmHM1XSetting.Click += new System.EventHandler(this.btnConfirmHM1XSetting_Click);
+            // 
+            // txbParameterOne
+            // 
+            this.txbParameterOne.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txbParameterOne.Location = new System.Drawing.Point(222, 99);
+            this.txbParameterOne.Name = "txbParameterOne";
+            this.txbParameterOne.Size = new System.Drawing.Size(387, 26);
+            this.txbParameterOne.TabIndex = 4;
+            this.txbParameterOne.Visible = false;
             // 
             // lblHM1XSettingInfo
             // 
@@ -1097,7 +1148,7 @@
             this.mnuMainMenu.ResumeLayout(false);
             this.mnuMainMenu.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
-            this.tbcPortSettings.ResumeLayout(false);
+            this.tbcBottomPane.ResumeLayout(false);
             this.tabPortSettings.ResumeLayout(false);
             this.tloPortSettings.ResumeLayout(false);
             this.tloPortSettings.PerformLayout();
@@ -1154,7 +1205,7 @@
         private System.Windows.Forms.ToolStripMenuItem serialPortsToolStripMenuItem;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.ToolStripMenuItem defaultToolStripMenuItem;
-        private System.Windows.Forms.TabControl tbcPortSettings;
+        private System.Windows.Forms.TabControl tbcBottomPane;
         private System.Windows.Forms.TabPage tabPortSettings;
         private System.Windows.Forms.TabPage tabDataSettings;
         private System.Windows.Forms.TabPage tabHM1XSettings;
@@ -1205,6 +1256,10 @@
         private System.Windows.Forms.ProgressBar pbSysStatus;
         private System.Windows.Forms.ComboBox cmbHM1XDeviceType;
         private System.Windows.Forms.Button btnClearSettings;
+        private System.Windows.Forms.TextBox txbParameterTwo;
+        private System.Windows.Forms.TextBox txbParameterOne;
+        private System.Windows.Forms.Label lblParameterTwo;
+        private System.Windows.Forms.Label lblParameterOne;
     }
 
 
