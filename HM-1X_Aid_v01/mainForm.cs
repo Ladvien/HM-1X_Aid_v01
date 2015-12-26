@@ -567,6 +567,10 @@ namespace HM_1X_Aid_v01
             lblParameterTwo.Text = "";
 
             hm1xConstants.hm1xEnumCommands selectedEnumeration = (hm1xConstants.hm1xEnumCommands) cmbHM1XCommands.SelectedIndex;
+
+            /// Keep it DRY.  The PowerOn and AfterConnection are the same case.
+            if (selectedEnumeration == hm1xConstants.hm1xEnumCommands.PIOStateAfterConnection) { selectedEnumeration = hm1xConstants.hm1xEnumCommands.PIOStateAfterPowerOn; }
+
             switch (selectedEnumeration)
             {
                 case hm1xConstants.hm1xEnumCommands.WhitelistMACAddress:
@@ -585,8 +589,6 @@ namespace HM_1X_Aid_v01
                         lblParameterTwo.Text = "Pin 0 to B";
                         lblParameterOne.Visible = true;
                         lblParameterTwo.Visible = true;
-
-
                     }
                     break;
             }

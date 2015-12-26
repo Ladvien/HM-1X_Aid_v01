@@ -603,6 +603,9 @@ class SerialPortsExtended: SerialPort
             WriteData(finalCommand);
         }
 
+        parameterOne.Text = "";
+        parameterTwo.Text = "";
+
         HM1XCallbackSetTimer(250); // Wait half a second for reply.
         SerialSystemUpdateHandler(this, "", 50, Color.LimeGreen);
     }
@@ -675,6 +678,7 @@ class SerialPortsExtended: SerialPort
         byte replyByte = 0x00;
         UInt16 endianCorrectedByte = 0x00;
         bool isSet = false;
+        string[] pinInfo = { "Pin B", "Pin A", "Pin 9", "Pin 8", "Pin 7", "Pin 6", "Pin 5", "Pin 4", "Pin 3", "Pin 2", "Pin 1 (NA)", "Pin 0 (NA)" };
 
         hm1xConstants.hm1xEnumCommands switchValue = (hm1xConstants.hm1xEnumCommands)originator;
         switch (switchValue)
@@ -863,25 +867,38 @@ class SerialPortsExtended: SerialPort
                 progressBar.Value = 75;
                 sysTextBox.Text += "Got BEFC.\n";
 
-
                 isItGetOrSetSAndByte(valueString, out getOrSet, out replyByte, out endianCorrectedByte, out isSet);
                 Console.WriteLine(replyByte);
 
-
                 if (isSet)
                 {
-
-                } else
-                {
-                    string[] pinInfo = { "Pin B", "Pin A", "Pin 9", "Pin 8", "Pin 7", "Pin 6", "Pin 5", "Pin 4", "Pin 3", "Pin 2", "Pin 1 (NA)", "Pin 0 (NA)" };
+                    //char[] hexCharArray = valueString.ToCharArray();
+                    string addedLeadZero = "0";
+                    addedLeadZero += valueString.Replace("OK+Set:", "");
+                    Console.WriteLine(addedLeadZero);
+                    int hexToInt = Convert.ToInt32(addedLeadZero, 16);
 
                     for (int i = 11; i > -1; i--)
                     {
                         mainDisplay.Text += pinInfo[i];
                         if (IsBitSet((byte)endianCorrectedByte, i))
                         {
-                            mainDisplay.Text += " after power on is set to HIGH.\n";
-                            
+                            mainDisplay.Text += " was set HIGH.\n";
+                        }
+                        else
+                        {
+                            mainDisplay.Text += " was set LOW. \n";
+                        }
+                    }
+
+                } else
+                {
+                    for (int i = 11; i > -1; i--)
+                    {
+                        mainDisplay.Text += pinInfo[i];
+                        if (IsBitSet((byte)endianCorrectedByte, i))
+                        {
+                            mainDisplay.Text += " after power on is set to HIGH.\n";   
                         }
                         else
                         {
@@ -889,17 +906,148 @@ class SerialPortsExtended: SerialPort
                         }
                     }
                 }
-               
-
                 valueString += "\n";
-                mainDisplay.Text += valueString;
                 progressBar.BackColor = Color.LimeGreen;
                 progressBar.Value = 100;
                 break;
-            
+            case hm1xConstants.hm1xEnumCommands.PIOStateAfterConnection:
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 75;
+                sysTextBox.Text += "Got AFTC.\n";
+
+                isItGetOrSetSAndByte(valueString, out getOrSet, out replyByte, out endianCorrectedByte, out isSet);
+                Console.WriteLine(replyByte);
+
+                if (isSet)
+                {
+                    //char[] hexCharArray = valueString.ToCharArray();
+                    string addedLeadZero = "0";
+                    addedLeadZero += valueString.Replace("OK+Set:", "");
+                    Console.WriteLine(addedLeadZero);
+                    int hexToInt = Convert.ToInt32(addedLeadZero, 16);
+
+                    for (int i = 11; i > -1; i--)
+                    {
+                        mainDisplay.Text += pinInfo[i];
+                        if (IsBitSet((byte)endianCorrectedByte, i))
+                        {
+                            mainDisplay.Text += " was set HIGH.\n";
+                        }
+                        else
+                        {
+                            mainDisplay.Text += " was set LOW. \n";
+                        }
+                    }
+
+                }
+                else
+                {
+                    for (int i = 11; i > -1; i--)
+                    {
+                        mainDisplay.Text += pinInfo[i];
+                        if (IsBitSet((byte)endianCorrectedByte, i))
+                        {
+                            mainDisplay.Text += " after connected is set to HIGH.\n";
+                        }
+                        else
+                        {
+                            mainDisplay.Text += " after connected on is set to LOW. \n";
+                        }
+                    }
+                }
+                valueString += "\n";
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 100;
+                break;
+            case hm1xConstants.hm1xEnumCommands.BatteryMonitor:
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 0;
+                sysTextBox.Text += "Got AFTC.\n";
+
+
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+
+                switch (replySwitch)
+                {
+                    case 0:
+                        mainDisplay.Text += "Battery monitor set OFF.\n";
+                        break;
+                    case 1:
+                        mainDisplay.Text += "Battery monitor set ON.\n";
+                        break;
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.BatteryInformation:
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 0;
+                sysTextBox.Text += "Got BATT.\n";
+
+                mainDisplay.Text += "Battery Power: %" + valueString.Replace("OK+Get:", "");
+                break;
+            case hm1xConstants.hm1xEnumCommands.BitFormat:
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 0;
+                sysTextBox.Text += "Got BIT7.\n";
+
+
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+
+                switch (replySwitch)
+                {
+                    case 0:
+                        mainDisplay.Text += "Set to 7-Bit NON-Compatible.\n";
+                        break;
+                    case 1:
+                        mainDisplay.Text += "Set to 7-Bit Compatible.\n";
+                        break;
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.BaudRate:
+                progressBar.BackColor = Color.LimeGreen;
+                progressBar.Value = 0;
+                sysTextBox.Text += "Got BAUD.\n";
+
+
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+
+                switch (replySwitch)
+                {
+                    case 0:
+                        mainDisplay.Text += "Set to Baud 9600\n";
+                        break;
+                    case 1:
+                        mainDisplay.Text += "Set to Baud 19200\n";
+                        break;
+                    case 2:
+                        mainDisplay.Text += "Set to Baud 38400\n";
+                        break;
+                    case 3:
+                        mainDisplay.Text += "Set to Baud 57600\n";
+                        break;
+                    case 4:
+                        mainDisplay.Text += "Set to Baud 115200\n";
+                        break;
+                    case 5:
+                        mainDisplay.Text += "Set to Baud 4800\n";
+                        break;
+                    case 6:
+                        mainDisplay.Text += "Set to Baud 2400\n";
+                        break;
+                    case 7:
+                        mainDisplay.Text += "Set to Baud 1200\n";
+                        break;
+                    case 8:
+                        mainDisplay.Text += "Set to Baud 230400\n";
+                        break;
+                }
+                break;
+
+
+
         }
         captureStream = false;
-
+        mainDisplay.SelectionStart = mainDisplay.Text.Length;
+        mainDisplay.ScrollToCaret();
     }
 
     private void isItGetOrSet(string valueString, out string displayResponse, out int replySwitchInt, out bool isSet)

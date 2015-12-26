@@ -12,7 +12,7 @@ namespace HM_1X_Aid_v01
 
 
         public static string[] hm1xCommandsString = {"None", "AT", "AT+ADC", "AT+ADDR","AT+ADVI","AT+ADTY","AT+ANCS","AT+ALLO","AT+AD","AT+BEFC","AT+AFTC","AT+BATC","AT+BATT",
-                                   "AT+BIT","AT+BAUD","AT+COMI","AT+COMA","AT+COLA","AT+COUP","AT+CHAR", "AT+CLEAR","AT+CONL","AT+CO","AT+COL",
+                                   "AT+BIT7","AT+BAUD","AT+COMI","AT+COMA","AT+COLA","AT+COUP","AT+CHAR", "AT+CLEAR","AT+CONL","AT+CO","AT+COL",
                                    "AT+CYC", "AT+DISC", "AT+DISI", "AT+CONN", "AT+DELO", "AT+ERASE", "AT+FLAG", "AT+FILT", "AT+FIOW", "AT+GAIN",
                                    "AT+HELP", "AT+IMME", "AT+IBEA", "AT+BEA0", "AT+BEA1", "AT+BEA2", "AT+BEA3", "AT+MARJ", "AT+MINO", "AT+MEAS",
                                    "AT+MODE", "AT+NOTI", "AT+NOTP", "AT+NAME", "AT+PCTL", "AT+PARI", "AT+PIO", "AT+PASS", "AT+PIN", "AT+POWE",
@@ -275,10 +275,69 @@ namespace HM_1X_Aid_v01
                     settingsExplained.SelectedIndex = 0;
                     break;
                 //"AT+AFTC"
+                case hm1xConstants.hm1xEnumCommands.PIOStateAfterConnection:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get PIO State After Connected");
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Set PIO After Connected");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+BATC"
+                case hm1xConstants.hm1xEnumCommands.BatteryMonitor:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Battery Monitor State");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Turn Battery Monitor Off");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Turn Battery Monitor On");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+BATT",
-                //"AT+BIT",
+                case hm1xConstants.hm1xEnumCommands.BatteryInformation:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Battery Monitor Information");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
+                //"AT+BIT7",
+                case hm1xConstants.hm1xEnumCommands.BitFormat:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get 7-Bit Setting");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set to 7-Bit NOT Compatible");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set to 7-Bit Compatible");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+BAUD",
+                case hm1xConstants.hm1xEnumCommands.BaudRate:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Baud Rate");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set Baud to 9600");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set Baud to 19200");
+                    atCommandList.Add("2");
+                    settingsExplained.Items.Add("Set Baud to 38400");
+                    atCommandList.Add("3");
+                    settingsExplained.Items.Add("Set Baud to 57600");
+                    atCommandList.Add("4");
+                    settingsExplained.Items.Add("Set Baud to 115200");
+                    atCommandList.Add("5");
+                    settingsExplained.Items.Add("Set Baud to 4800");
+                    atCommandList.Add("6");
+                    settingsExplained.Items.Add("Set Baud to 2400");
+                    atCommandList.Add("7");
+                    settingsExplained.Items.Add("Set Baud to 1200");
+                    atCommandList.Add("8");
+                    settingsExplained.Items.Add("Set Baud to 230400");
+
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+COMI",
                 //"AT+COMA",
                 //"AT+COLA",
@@ -354,10 +413,11 @@ namespace HM_1X_Aid_v01
             }
         }
 
-        public void adjustParametersAndOtherSettings(hm1xConstants.hm1xEnumCommands enumeratedSelection, int settingsSelection, TextBox parameterOne, TextBox parameterTwo)
+        public void adjustParametersAndOtherSettings(hm1xConstants.hm1xEnumCommands selectedEnumeration, int settingsSelection, TextBox parameterOne, TextBox parameterTwo)
         {
-
-            switch (enumeratedSelection)
+            /// Keep it DRY.  The PowerOn and AfterConnection are the same case.
+            if(selectedEnumeration == hm1xConstants.hm1xEnumCommands.PIOStateAfterConnection) { selectedEnumeration = hm1xConstants.hm1xEnumCommands.PIOStateAfterPowerOn; }
+            switch (selectedEnumeration)
             {
                 case hm1xConstants.hm1xEnumCommands.WhitelistMACAddress:
                     if (settingsSelection > 2)
@@ -384,8 +444,20 @@ namespace HM_1X_Aid_v01
                     }
                     break;
                 case hm1xConstants.hm1xEnumCommands.PIOStateAfterPowerOn:
+
+                    // Check to make sure we got a combobox index.
                     if (settingsSelection > 0)
                     {
+                        // Turn all the "bits" into a charArray to check each of their validity.
+                        char[] trueBitCharArray = parameterOne.Text.ToCharArray();
+                        for (int i = 0; i < trueBitCharArray.Count(); i++)
+                        {
+                            if (trueBitCharArray[i] > '1') { trueBitCharArray[i] = '1'; } else if (trueBitCharArray[i] < '0') { trueBitCharArray[i] = '0'; }
+                        }
+
+                        parameterOne.Text = new string(trueBitCharArray);
+
+                        // Check to make sure it is not more or less than 12 characters.
                         int numberOfBits = parameterOne.Text.Count();
                         if (numberOfBits < 13)
                         {
@@ -396,15 +468,20 @@ namespace HM_1X_Aid_v01
                         }
                         else if (numberOfBits > 12)
                         {
-                            Console.WriteLine(numberOfBits);
-                            Console.WriteLine(numberOfBits - 12);
                             parameterOne.Text = parameterOne.Text.Remove(12, numberOfBits - 12);
                         }
+                        
+                        // Convert string bits into string hex.
                         parameterOne.Text = BinaryStringToHexString(parameterOne.Text);
-                        Console.WriteLine(parameterOne.Text);
+                        
                         // Remove the upper nibble.
                         parameterOne.Text = parameterOne.Text.Remove(0, 1);
-                        Console.WriteLine(parameterOne.Text);
+
+                        // Convert back to array to check the range of first char.
+                        char[] checkFirstCharRangeCharArray = parameterOne.Text.ToCharArray();
+                        if(checkFirstCharRangeCharArray[0] > '3') { checkFirstCharRangeCharArray[0] = '3'; }
+                        parameterOne.Text = new string(checkFirstCharRangeCharArray);
+
                     }
                     else
                     {
