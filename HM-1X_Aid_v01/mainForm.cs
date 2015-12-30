@@ -546,6 +546,16 @@ namespace HM_1X_Aid_v01
             }
         }
 
+        private void clearParameterUI()
+        {
+            txbParameterOne.Visible = false;
+            txbParameterTwo.Visible = false;
+            lblParameterOne.Visible = false;
+            lblParameterTwo.Visible = false;
+            lblParameterOne.Text = "";
+            lblParameterTwo.Text = "";
+        }
+
         private void btnClearSettings_Click(object sender, EventArgs e)
         {
             resetSettings();
@@ -553,6 +563,8 @@ namespace HM_1X_Aid_v01
 
         private void cmbHM1XCommands_SelectedIndexChanged(object sender, EventArgs e)
         {
+            //Make sure the parameter boxes and labels are hidden unless needed.
+            clearParameterUI();
             cmbHM1XSettings.Items.Clear();
             serialPorts.clearSettingsList();
             serialPorts.commandSelectedMessage(rtbMainDisplay, (hm1xConstants.hm1xEnumCommands)cmbHM1XCommands.SelectedIndex);
@@ -561,12 +573,7 @@ namespace HM_1X_Aid_v01
         private void cmbHM1XSettings_SelectedIndexChanged(object sender, EventArgs e)
         {
             //Make sure the parameter boxes and labels are hidden unless needed.
-            txbParameterOne.Visible = false;
-            txbParameterTwo.Visible = false;
-            lblParameterOne.Visible = false;
-            lblParameterTwo.Visible = false;
-            lblParameterOne.Text = "";
-            lblParameterTwo.Text = "";
+            clearParameterUI();
 
             hm1xConstants.hm1xEnumCommands selectedEnumeration = (hm1xConstants.hm1xEnumCommands) cmbHM1XCommands.SelectedIndex;
 

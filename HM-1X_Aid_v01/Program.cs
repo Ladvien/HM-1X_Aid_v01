@@ -306,6 +306,7 @@ class SerialPortsExtended: SerialPort
     {
         // Gets incoming data from open port and passes it to a handler.
         InputData = ComPort.ReadExisting();
+        Console.WriteLine("RXed: {0}", InputData);
         
         // If not empty and we want to foreit capture to delegate.
         if (InputData != String.Empty && captureStream == false)
@@ -315,7 +316,14 @@ class SerialPortsExtended: SerialPort
                 this.DataReceivedEventHandler(this, InputData);
             }
             catch (UnauthorizedAccessException ex) { MessageBox.Show(ex.Message); }
-        } else
+        } else if (InputData != String.Empty && captureStream == true)
+        {
+            captureBuffer = InputData;
+            Console.WriteLine("Debug1: {0}", captureBuffer);
+            HM1XupdatedHandler(this, waitingOn, captureBuffer);
+            captureBuffer = "";
+        }
+        else
         {
             // We retain capture. 
             captureBuffer = InputData;
@@ -603,6 +611,9 @@ class SerialPortsExtended: SerialPort
             finalCommand += parameterTwoStr;
         }
 
+        responseTimeout = hm1xSettings.getResponseTimeNeeded(commandComboBoxSelectedIndexAsEnum);
+        HM1XCallbackSetTimer(responseTimeout); // Wait half a second for reply.
+
         if (finalCommand != "")
         {
             WriteData(finalCommand);
@@ -610,9 +621,6 @@ class SerialPortsExtended: SerialPort
 
         parameterOne.Text = "";
         parameterTwo.Text = "";
-
-
-        HM1XCallbackSetTimer(responseTimeout); // Wait half a second for reply.
         SerialSystemUpdateHandler(this, "", 50);
     }
 
@@ -623,6 +631,9 @@ class SerialPortsExtended: SerialPort
 
     private void HM1XCallbackSetTimer(int milliseconds)
     {
+
+        Console.WriteLine("Set timer for {0}ms", milliseconds);
+
         // Create a timer with a two second interval.
         HM1Xtimer = new System.Timers.Timer(milliseconds);
         // Hook up the Elapsed event for the timer. 
@@ -694,6 +705,9 @@ class SerialPortsExtended: SerialPort
         progressBar.BackColor = Color.LimeGreen;
         progressBar.Value = 50;
 
+        // Must invalidate timer or updateUIAfterDataRX will fire again after it fired due to RX.
+        HM1Xtimer.Enabled = false;
+
         hm1xConstants.hm1xEnumCommands switchValue = (hm1xConstants.hm1xEnumCommands)originator;
 
         sysTextBox.Text += "Got " + hm1xConstants.getCommandStringFromEnum(switchValue) + "\r\n";
@@ -702,6 +716,7 @@ class SerialPortsExtended: SerialPort
         {
             case hm1xConstants.hm1xEnumCommands.None:
                 errorFlag = true;
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.CheckStatus:
                 label.Text = "Connected";
@@ -709,22 +724,25 @@ class SerialPortsExtended: SerialPort
                 progressBar.BackColor = Color.LimeGreen;
                 mainDisplay.Text += "Connected\r\n";
                 setHM1XConnection();
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.Version:
                 mainDisplay.Text += "Firmware version: " + value.ToString() + "\r\n";
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.ADC:
                 valueString = valueString.Replace("OK+ADC", "Pin IO #");
                 valueString += "\r\n";
                 mainDisplay.Text += valueString;
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.MACAddress:
                 valueString = valueString.Replace("OK+ADDR:", "MAC Address: ");
                 valueString += "\r\n";
                 mainDisplay.Text += valueString;
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.AdvertizingInterval:
-                sysTextBox.Text += "Got ADVI.\r\n";
                 if (valueString.Contains("OK+Get:"))
                 {
                     valueString = valueString.Replace("OK+Get:", "Got Advertizing interval: ");
@@ -734,12 +752,13 @@ class SerialPortsExtended: SerialPort
                 }
                 valueString += "\r\n";
                 mainDisplay.Text += valueString;
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.AdvertizingType:
                 
                 if (valueString.Contains("OK+Get:"))
                 {
-                    valueString = valueString.Replace("OK+Get: ", "");
+                    valueString = valueString.Replace("OK+Get:", "");
                     getOrSet = "Got response: ";
                 }
                 else if(valueString.Contains("OK+Set:"))
@@ -750,7 +769,7 @@ class SerialPortsExtended: SerialPort
 
                 try { replySwitch = Convert.ToInt32(valueString); } catch {; }
                 valueString = getOrSet;
-
+                Console.WriteLine(replySwitch);
                 switch (replySwitch)
                 {
                     case 0:
@@ -763,11 +782,12 @@ class SerialPortsExtended: SerialPort
                         valueString += "Allow advertizing and Scan-Response";
                         break;
                     case 3:
-                        valueString += "Allow advertizing and Scan-Response";
+                        valueString += "Only allow advertizing";
                         break;
                 }
-                valueString += "\n";
+                valueString += "\r\n";
                 mainDisplay.Text += valueString;
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.ANCS:
 
@@ -781,12 +801,13 @@ class SerialPortsExtended: SerialPort
                         valueString += " ANCS is Off";
                         break;
                     case 1:
-                        valueString += " ANCS is On  -- the module must be reset for this to go into effect \n";
+                        valueString += " ANCS is On  -- the module must be reset for this to go into effect \r\n";
                         valueString += "and the bond mode must be set to \"Authorize and Bond.\"";
                         break;
                 }
                 valueString += "\r\n";
                 mainDisplay.Text += valueString;
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.LastConnectedAddress:
 
@@ -796,8 +817,9 @@ class SerialPortsExtended: SerialPort
                 } else {
                     // Error
                 }  
-                valueString += "\n";
+                valueString += "\r\n";
                 mainDisplay.Text += valueString;
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.WhiteListSwitch:
 
@@ -814,8 +836,9 @@ class SerialPortsExtended: SerialPort
                         valueString += " Whitelist Switch is ON";
                         break;
                 }
-                valueString += "\n";
+                valueString += "\r\n";
                 mainDisplay.Text += valueString;
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.WhitelistMACAddress:
                 isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
@@ -844,8 +867,9 @@ class SerialPortsExtended: SerialPort
                 }
 
                 valueString = macAddress;
-                valueString += "\n";
+                valueString += "\r\n";
                 mainDisplay.Text += valueString;
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.PIOStateAfterPowerOn:
                 isItGetOrSetSAndByte(valueString, out getOrSet, out replyByte, out endianCorrectedByte, out isSet);
@@ -863,11 +887,11 @@ class SerialPortsExtended: SerialPort
                         mainDisplay.Text += pinInfo[i];
                         if (IsBitSet((byte)endianCorrectedByte, i))
                         {
-                            mainDisplay.Text += " was set HIGH.\n";
+                            mainDisplay.Text += " was set HIGH.\r\n";
                         }
                         else
                         {
-                            mainDisplay.Text += " was set LOW. \n";
+                            mainDisplay.Text += " was set LOW.\r\n";
                         }
                     }
 
@@ -878,15 +902,16 @@ class SerialPortsExtended: SerialPort
                         mainDisplay.Text += pinInfo[i];
                         if (IsBitSet((byte)endianCorrectedByte, i))
                         {
-                            mainDisplay.Text += " after power on is set to HIGH.\n";   
+                            mainDisplay.Text += " after power on is set to HIGH.\r\n";   
                         }
                         else
                         {
-                            mainDisplay.Text += " after power on is set to LOW. \n";
+                            mainDisplay.Text += " after power on is set to LOW.\r\n";
                         }
                     }
                 }
                 valueString += "\n";
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.PIOStateAfterConnection:
                 isItGetOrSetSAndByte(valueString, out getOrSet, out replyByte, out endianCorrectedByte, out isSet);
@@ -905,11 +930,11 @@ class SerialPortsExtended: SerialPort
                         mainDisplay.Text += pinInfo[i];
                         if (IsBitSet((byte)endianCorrectedByte, i))
                         {
-                            mainDisplay.Text += " was set HIGH.\n";
+                            mainDisplay.Text += " was set HIGH.\r\n";
                         }
                         else
                         {
-                            mainDisplay.Text += " was set LOW. \n";
+                            mainDisplay.Text += " was set LOW.\r\n";
                         }
                     }
 
@@ -921,15 +946,16 @@ class SerialPortsExtended: SerialPort
                         mainDisplay.Text += pinInfo[i];
                         if (IsBitSet((byte)endianCorrectedByte, i))
                         {
-                            mainDisplay.Text += " after connected is set to HIGH.\n";
+                            mainDisplay.Text += " after connected is set to HIGH.\r\n";
                         }
                         else
                         {
-                            mainDisplay.Text += " after connected on is set to LOW. \n";
+                            mainDisplay.Text += " after connected on is set to LOW. \r\n";
                         }
                     }
                 }
-                valueString += "\n";
+                valueString += "\r\n";
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.BatteryMonitor:
                 
@@ -938,16 +964,17 @@ class SerialPortsExtended: SerialPort
                 switch (replySwitch)
                 {
                     case 0:
-                        mainDisplay.Text += "Battery monitor set OFF.\n";
+                        mainDisplay.Text += "Battery monitor set OFF.\r\n";
                         break;
                     case 1:
-                        mainDisplay.Text += "Battery monitor set ON.\n";
+                        mainDisplay.Text += "Battery monitor set ON.\r\n";
                         break;
                 }
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.BatteryInformation:
-                
-                mainDisplay.Text += "Battery Power: %" + valueString.Replace("OK+Get:", "");
+                mainDisplay.Text += "Battery Power: %" + valueString.Replace("OK+Get:", "") + "\r\n";
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.BitFormat:
                 
@@ -956,12 +983,13 @@ class SerialPortsExtended: SerialPort
                 switch (replySwitch)
                 {
                     case 0:
-                        mainDisplay.Text += "Set to 7-Bit NON-Compatible.\n";
+                        mainDisplay.Text += "Set to 7-Bit NON-Compatible.\r\n";
                         break;
                     case 1:
-                        mainDisplay.Text += "Set to 7-Bit Compatible.\n";
+                        mainDisplay.Text += "Set to 7-Bit Compatible.\r\n";
                         break;
                 }
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.BaudRate:
                
@@ -971,37 +999,38 @@ class SerialPortsExtended: SerialPort
                 switch (replySwitch)
                 {
                     case 0:
-                        mainDisplay.Text += "Set to Baud 9600\n";
+                        mainDisplay.Text += "Set to Baud 9600\r\n";
                         break;
                     case 1:
-                        mainDisplay.Text += "Set to Baud 19200\n";
+                        mainDisplay.Text += "Set to Baud 19200\r\n";
                         break;
                     case 2:
-                        mainDisplay.Text += "Set to Baud 38400\n";
+                        mainDisplay.Text += "Set to Baud 38400\r\n";
                         break;
                     case 3:
-                        mainDisplay.Text += "Set to Baud 57600\n";
+                        mainDisplay.Text += "Set to Baud 57600\r\n";
                         break;
                     case 4:
-                        mainDisplay.Text += "Set to Baud 115200\n";
+                        mainDisplay.Text += "Set to Baud 115200\r\n";
                         break;
                     case 5:
-                        mainDisplay.Text += "Set to Baud 4800\n";
+                        mainDisplay.Text += "Set to Baud 4800\r\n";
                         break;
                     case 6:
-                        mainDisplay.Text += "Set to Baud 2400\n";
+                        mainDisplay.Text += "Set to Baud 2400\r\n";
                         break;
                     case 7:
-                        mainDisplay.Text += "Set to Baud 1200\n";
+                        mainDisplay.Text += "Set to Baud 1200\r\n";
                         break;
                     case 8:
-                        mainDisplay.Text += "Set to Baud 230400\n";
+                        mainDisplay.Text += "Set to Baud 230400\r\n";
                         break;
                 }
                 if (isSet)
                 {
-                    mainDisplay.Text += "The module needs to be powered down before baud set is complete.\n";
+                    mainDisplay.Text += "The module needs to be powered down before baud set is complete.\r\n";
                 }
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.Characteristic:
                 
@@ -1009,20 +1038,20 @@ class SerialPortsExtended: SerialPort
                 
                 if(isSet)
                 {
-                    mainDisplay.Text += "Characteristic set to: " + valueString.Replace("OK+Set:", "") + "\n";
+                    mainDisplay.Text += "Characteristic set to: " + valueString.Replace("OK+Set:", "") + "\r\n";
                 } else
                 {
-                    mainDisplay.Text += "Your characteristic setting is currently: " + valueString.Replace("OK+Get:", "") + "\n";
+                    mainDisplay.Text += "Your characteristic setting is currently: " + valueString.Replace("OK+Get:", "") + "\r\n";
                 }
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.ClearLastConnected:
-                sysTextBox.Text += "Got CLEAR\n";
-
                 if (valueString.Contains("OK+CLEAR"))
                 {
                     valueString = valueString.Replace("OK+CONN", "");
-                    mainDisplay.Text += "Last Connected Device Cleared.\n";
+                    mainDisplay.Text += "Last Connected Device Cleared.\r\n";
                 }
+                finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.TryLastConnected:
 
@@ -1032,61 +1061,44 @@ class SerialPortsExtended: SerialPort
                     switch (switchString)
                     {
                         case "N":
-                            mainDisplay.Text += "No address provided\n";
+                            mainDisplay.Text += "No address provided\r\n";
                             break;
                         case "L":
-                            mainDisplay.Text += "Connecting\n";
+                            mainDisplay.Text += "Connecting\r\n";
                             break;
                         case "E":
-                            mainDisplay.AppendText("Connection error", Color.Crimson);
+                            mainDisplay.AppendText("Connection error\r\n", Color.Crimson);
                             errorFlag = true;
                             break;
                         case "F":
                             errorFlag = true;
-                            mainDisplay.AppendText("Connect Fail\n", Color.Crimson);
+                            mainDisplay.AppendText("Connect Fail\r\n", Color.Crimson);
                             break;
                     }
                 }
                 break;
-            case hm1xConstants.hm1xEnumCommands.TryConnectionAddress:
-                Console.WriteLine(valueString);
+            case hm1xConstants.hm1xEnumCommands.TryConnectionAddress:                
+
                 if (valueString.Contains("OK+CONN"))
                 {
-                    int valueStringLength = valueString.Length;
-                    if(valueStringLength != 21) // We didn't get a whole "OK+CONN", which makes me wonder how we get this far?
-                    {
-                        errorFlag = true;
-                        Console.WriteLine(valueString);
-                    }
-                    else if(valueStringLength > 20) // AT+CONN N 0017EA090909 E
-                    {
-
-                    }
-                    string moduleType = valueString.Substring(7, 1); // N = BLE Module, 1 = Dual Mode.
-                    macAddress = valueString.Substring(8, 12); // Declared at switch head.
-                    string responseCode = "";
-                    if (valueString.Length > 19)
-                    {
-                        try { responseCode = valueString.Substring(20, 1); } catch {; }
-                    } // E.g., AT+CONNN0017EA090909 = 20 chars
-
-
                     string switchString = valueString.Replace("OK+CONN", "");
                     switch (switchString)
                     {
                         case "A":
                             mainDisplay.Text += "Accept request, connecting...\r\n";
                             break;
-                        case "L":
-                            mainDisplay.Text += "Connecting\n";
+                        case "":
+                            mainDisplay.Text += "Connected\r\n";
+                            finishedCommand();
                             break;
                         case "E":
-                            mainDisplay.AppendText("Connection error", Color.Crimson);
+                            mainDisplay.AppendText("Connection error\r\n", Color.Crimson);
                             errorFlag = true;
+                            finishedCommand();
                             break;
                         case "F":
-                            errorFlag = true;
-                            mainDisplay.AppendText("Connect Fail\n", Color.Crimson);
+                            mainDisplay.AppendText("Connect Fail\r\n", Color.Crimson);
+                            finishedCommand();
                             break;
                     }
                 }
@@ -1107,6 +1119,7 @@ class SerialPortsExtended: SerialPort
             sysTextBox.Text += "ERROR";
             mainDisplay.AppendText("ERROR\n", Color.Red);
             progressBar.Value = 100;
+            finishedCommand();
         }
         else
         {
@@ -1114,11 +1127,16 @@ class SerialPortsExtended: SerialPort
             progressBar.Value = 100;
         }
 
-        captureStream = false;
         mainDisplay.SelectionStart = mainDisplay.Text.Length;
         mainDisplay.ScrollToCaret();
         sysTextBox.SelectionStart = mainDisplay.Text.Length;
         sysTextBox.ScrollToCaret();
+    }
+
+    public void finishedCommand()
+    {
+        waitingOn = hm1xConstants.hm1xEnumCommands.None;
+        captureStream = false;
     }
 
     private void isItGetOrSet(string valueString, out string displayResponse, out int replySwitchInt, out bool isSet)

@@ -459,17 +459,33 @@ namespace HM_1X_Aid_v01
             }
         }
 
+        public int getResponseTimeNeeded(hm1xConstants.hm1xEnumCommands selectedEnumeration)
+        {
+            int millisecondsReturned = 0;
+
+            switch (selectedEnumeration)
+            {
+                case hm1xConstants.hm1xEnumCommands.TryConnectionAddress:
+                    millisecondsReturned = 12000;
+                    break;
+                default:
+                    millisecondsReturned = 250;
+                    break;
+            }
+            return millisecondsReturned;
+        }
+
         public void adjustParametersAndOtherSettings(hm1xConstants.hm1xEnumCommands selectedEnumeration, int settingsSelection, TextBox parameterOne, TextBox parameterTwo)
         {
             /// Keep it DRY.  The PowerOn and AfterConnection are the same case.
             if(selectedEnumeration == hm1xConstants.hm1xEnumCommands.PIOStateAfterConnection) { selectedEnumeration = hm1xConstants.hm1xEnumCommands.PIOStateAfterPowerOn; }
-            
+
             switch (selectedEnumeration)
             {
                 case hm1xConstants.hm1xEnumCommands.WhitelistMACAddress:
                     if (settingsSelection > 2)
                     {
-                        conformMACAddress(parameterOne.Text);
+                        parameterOne.Text = conformMACAddress(parameterOne.Text);
                     }
                     else
                     {
@@ -563,7 +579,7 @@ namespace HM_1X_Aid_v01
                     }
                     break;
                 case hm1xConstants.hm1xEnumCommands.TryConnectionAddress:
-                    conformMACAddress(parameterOne.Text);
+                    parameterOne.Text = conformMACAddress(parameterOne.Text);
                     break;
             }
         }
@@ -593,22 +609,24 @@ namespace HM_1X_Aid_v01
             return result.ToString();
         }
 
-        private void conformMACAddress(string address)
+        private string conformMACAddress(string address)
         {
-            address = address.ToUpper();
-            int macAddressCharCount = address.Count();
+            string returnString = address;
+            returnString = returnString.ToUpper();
+            int macAddressCharCount = returnString.Count();
             if (macAddressCharCount < 12)
             {
                 for (int i = 0; i < (12 - macAddressCharCount); i++)
                 {
-                    address += "0";
+                    returnString += "0";
                 }
             }
             else if (macAddressCharCount > 12)
             {
-                address = address.Remove(12, macAddressCharCount - 12);
+                returnString = returnString.Remove(12, macAddressCharCount - 12);
             }
             Console.WriteLine(address);
+            return returnString;
         }
     } // End hm1xSettings
 
