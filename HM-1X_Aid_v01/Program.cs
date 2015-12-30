@@ -54,7 +54,7 @@ class SerialPortsExtended: SerialPort
     private int hm1xVersion = 0;
 
     // Response timeout
-    int responseTimeout = 250;
+    int responseTimeout = 300;
 
     // HM-1X END //////////////////
 
@@ -348,7 +348,7 @@ class SerialPortsExtended: SerialPort
             if (isPortOpen())
             {
                 ComPort.Write(dataToWrite);
-                Console.WriteLine(dataToWrite);
+                Console.WriteLine("Data Sent: {0}", dataToWrite);
             } else
             {
                 MessageBox.Show(null, "No open port.", "Port error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -712,6 +712,8 @@ class SerialPortsExtended: SerialPort
 
         sysTextBox.Text += "Got " + hm1xConstants.getCommandStringFromEnum(switchValue) + "\r\n";
 
+        Console.WriteLine("UI Update Switch: {0}", switchValue.ToString());
+
         switch (switchValue)
         {
             case hm1xConstants.hm1xEnumCommands.None:
@@ -769,7 +771,6 @@ class SerialPortsExtended: SerialPort
 
                 try { replySwitch = Convert.ToInt32(valueString); } catch {; }
                 valueString = getOrSet;
-                Console.WriteLine(replySwitch);
                 switch (replySwitch)
                 {
                     case 0:
@@ -872,14 +873,13 @@ class SerialPortsExtended: SerialPort
                 finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.PIOStateAfterPowerOn:
-                isItGetOrSetSAndByte(valueString, out getOrSet, out replyByte, out endianCorrectedByte, out isSet);
+                isItGetOrSetSAndByte(valueString, out getOrSet, out endianCorrectedByte, out isSet);
 
                 if (isSet)
                 {
                     //char[] hexCharArray = valueString.ToCharArray();
                     string addedLeadZero = "0";
                     addedLeadZero += valueString.Replace("OK+Set:", "");
-                    Console.WriteLine(addedLeadZero);
                     int hexToInt = Convert.ToInt32(addedLeadZero, 16);
 
                     for (int i = 11; i > -1; i--)
@@ -914,15 +914,13 @@ class SerialPortsExtended: SerialPort
                 finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.PIOStateAfterConnection:
-                isItGetOrSetSAndByte(valueString, out getOrSet, out replyByte, out endianCorrectedByte, out isSet);
-                Console.WriteLine(replyByte);
+                isItGetOrSetSAndByte(valueString, out getOrSet, out endianCorrectedByte, out isSet);
 
                 if (isSet)
                 {
                     //char[] hexCharArray = valueString.ToCharArray();
                     string addedLeadZero = "0";
                     addedLeadZero += valueString.Replace("OK+Set:", "");
-                    Console.WriteLine(addedLeadZero);
                     int hexToInt = Convert.ToInt32(addedLeadZero, 16);
 
                     for (int i = 11; i > -1; i--)
@@ -1067,12 +1065,12 @@ class SerialPortsExtended: SerialPort
                             mainDisplay.Text += "Connecting\r\n";
                             break;
                         case "E":
-                            mainDisplay.AppendText("Connection error\r\n", Color.Crimson);
+                            mainDisplay.AppendText("Connection error\r\n", Color.Red);
                             errorFlag = true;
                             break;
                         case "F":
                             errorFlag = true;
-                            mainDisplay.AppendText("Connect Fail\r\n", Color.Crimson);
+                            mainDisplay.AppendText("Connect Fail\r\n", Color.Red);
                             break;
                     }
                 }
@@ -1092,18 +1090,145 @@ class SerialPortsExtended: SerialPort
                             finishedCommand();
                             break;
                         case "E":
-                            mainDisplay.AppendText("Connection error\r\n", Color.Crimson);
+                            mainDisplay.AppendText("Connection error\r\n", Color.Red);
                             errorFlag = true;
                             finishedCommand();
                             break;
                         case "F":
-                            mainDisplay.AppendText("Connect Fail\r\n", Color.Crimson);
+                            mainDisplay.AppendText("Connect Fail\r\n", Color.Red);
                             finishedCommand();
                             break;
                     }
                 }
                 break;
             case hm1xConstants.hm1xEnumCommands.PIOState:
+                if (valueString.Contains("OK+Col:"))
+                {
+                    valueString = valueString.Replace("OK+Col:", "");
+
+                    byte[] byteArray = StringToByteArrayFastest(valueString);
+
+                    replyByte = byteArray[0];
+                    for(int i = 11; i != 0; i--)
+                    {
+                        // I probably need to come back and work on this bit.
+                        // The actual register for PINs is 12-bits wide; I'm only listing 8 here.
+                        mainDisplay.Text += pinInfo[i];
+                        if(IsBitSet((byte)replyByte, i))
+                        {
+                            mainDisplay.Text += " HIGH\r\n";
+                        } else
+                        {
+                            mainDisplay.Text += " LOW\r\n";
+                        }
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.PIOCollectionRate:
+
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    mainDisplay.Text += "Pin IO collection rate set to " + replySwitch + " seconds\r\n";
+                }
+                else
+                {
+                    mainDisplay.Text += "Pin IO collection is currently set to " + replySwitch + " seconds\r\n";
+                }
+
+                break;
+
+            case hm1xConstants.hm1xEnumCommands.StartDiscovery:
+                ///////////////////////////////////////////////////////////////////////////////////////////////
+                /////////////////////////////// NOT COMPLETE //////////////////////////////////////////////////
+                /////////////////////////////// MUST HANDLE DISCOVERY /////////////////////////////////////////
+
+                if (valueString.Contains("OK+DISC"))
+                {
+                    valueString = valueString.Replace("OK+DISC", "");
+                    switch (valueString)
+                    {
+                        case "S":
+                            mainDisplay.Text += "Device search STARTED...\r\n";
+                            break;
+                        case "E":
+                            mainDisplay.Text += "Device search ENDED...\r\n";
+                            finishedCommand();
+                            break;
+                    }
+                } else
+                {
+                    errorFlag = true;
+                    finishedCommand();
+                }
+                ///////////////////////////////////////////////////////////////////////////////////////////////
+                ///////////////////////////////////////////////////////////////////////////////////////////////
+                break;
+            case hm1xConstants.hm1xEnumCommands.StartiBeaconDiscovery:
+                ///////////////////////////////////////////////////////////////////////////////////////////////
+                /////////////////////////////// NOT COMPLETE //////////////////////////////////////////////////
+                
+                Console.WriteLine("iBeacon found: {0}", valueString);
+                break;
+            case hm1xConstants.hm1xEnumCommands.ConnectToDiscoveredDevice:
+
+                if (valueString.Contains("OK+CONN"))
+                {
+                    string switchString = valueString.Replace("OK+CONN", "");
+                    switch (switchString)
+                    {
+                        case "N":
+                            mainDisplay.Text += "No address provided\r\n";
+                            break;
+                        case "L":
+                            mainDisplay.Text += "Connecting\r\n";
+                            break;
+                        case "E":
+                            mainDisplay.AppendText("Connection error\r\n", Color.Red);
+                            errorFlag = true;
+                            break;
+                        case "F":
+                            errorFlag = true;
+                            mainDisplay.AppendText("Connect Fail\r\n", Color.Red);
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.iBeaconMode:
+
+                //////////////// WILL NEED TO TEST AFTER UPGRADE ///////////////////////
+
+                if (valueString.Contains("OK+DELO"))
+                {
+                    string switchString = valueString.Replace("OK+DELO", "");
+                    switch (switchString)
+                    {
+                        case "1":
+                            mainDisplay.Text += "Set to allow broadcast and scanning.\r\n";
+                            break;
+                        case "2":
+                            mainDisplay.Text += "Set to only allow broadcast.\r\n";
+                            break;
+                    } 
+                } else
+                {
+                    mainDisplay.AppendText("No response received.  Not unsual, switching iBeacon mode requires reset.  Resets are weird.");
+                }
+                break;
+
+            case hm1xConstants.hm1xEnumCommands.RemoveBondInfo:
+                if (valueString.Contains("OK+ERASE")) { mainDisplay.Text += "Successfully erased bond info";  }
+                else { errorFlag = true; }
+                break;
+            case hm1xConstants.hm1xEnumCommands.AdvertizingFlag:
+                 
+                //////////////// WILL NEED TO TEST AFTER UPGRADE ///////////////////////
+
+                break;
+            case hm1xConstants.hm1xEnumCommands.FlowControlSwitch:
+
+                //////////////// WILL NEED TO TEST AFTER UPGRADE ///////////////////////
+
 
                 break;
             case hm1xConstants.hm1xEnumCommands.ERROR:
@@ -1154,15 +1279,15 @@ class SerialPortsExtended: SerialPort
             isSet = true;
         } else
         {
-            displayResponse = "ERROR ";
             isSet = false;
+            displayResponse = "ERROR";
         }
 
         try {replySwitchInt = Convert.ToInt32(valueString); } catch { replySwitchInt = 0 ;}
 
     }
 
-    private void isItGetOrSetSAndByte(string valueString, out string displayResponse, out byte replyByte, out UInt16 endianCorrectByte, out bool isSet)
+    private void isItGetOrSetSAndByte(string valueString, out string displayResponse, out UInt16 endianCorrectByte, out bool isSet)
     {
         if (valueString.Contains("OK+Get:"))
         {
@@ -1182,7 +1307,11 @@ class SerialPortsExtended: SerialPort
             displayResponse = "ERROR ";
         }
 
-        replyByte = 0;
+        correctEndiannessOfByte(valueString, out endianCorrectByte);
+    }
+
+    public void correctEndiannessOfByte(string valueString, out UInt16 endianCorrectByte)
+    {
         byte[] byteArray = StringToByteArrayFastest(valueString);
         if (BitConverter.IsLittleEndian) { Array.Reverse(byteArray); }
         try { endianCorrectByte = System.BitConverter.ToUInt16(byteArray, 0); } catch { endianCorrectByte = 0x00; }
@@ -1322,12 +1451,20 @@ class SerialPortsExtended: SerialPort
         {
             case hm1xConstants.hm1xEnumCommands.TryLastConnected:
                 richTextBox.Text += "This option only works if module is set to Central (ROLE0) and the Work Mode set to only connect when told (IMME1).\r\nThis command take will take 10 seconds for a response.\r\n";
-                setResponseTimeout(12000);
                 break;
             case hm1xConstants.hm1xEnumCommands.TryConnectionAddress:
                 richTextBox.Text += "This option only works if module is set to Central (ROLE0) and the Work Mode set to only connect when told (IMME1).\r\nThis command take will take 10 seconds for a response.\r\nMay receive a reply:\r\n\t\tOK + CONNA ========= Accept request, connection \r\n \t\tOK + CONNE ========= Connect error \r\n \t\tOK + CONN   ========= Connected, if AT + NOTI1 is setup \r\n \t\tOK + CONNF ========= Connect Failed, After 10 seconds\r\n";
-                setResponseTimeout(12000);
                 break;
+            case hm1xConstants.hm1xEnumCommands.StartDiscovery:
+                richTextBox.AppendText("For firmware versions less than v539 only six devices can be discovered at a time.  After v539, it is unlimited.\r\n", Color.Red);
+                break;
+            case hm1xConstants.hm1xEnumCommands.ConnectToDiscoveredDevice:
+                richTextBox.AppendText("NOTE: Devices must be discovered first.\r\n", Color.Red);
+                break;
+            case hm1xConstants.hm1xEnumCommands.iBeaconMode:
+                richTextBox.AppendText("After execution, module will reset after 500ms\r\n", Color.Red);
+                break;
+                 
         }
         richTextBox.SelectionStart = richTextBox.Text.Length;
         richTextBox.ScrollToCaret();

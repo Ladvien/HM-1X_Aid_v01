@@ -622,7 +622,25 @@ namespace HM_1X_Aid_v01
                     lblParameterOne.Visible = true;
                     txbParameterOne.Visible = true;
                     break;
-                
+                case hm1xConstants.hm1xEnumCommands.PIOCollectionRate:
+                    if(cmbHM1XSettings.SelectedIndex > 0)
+                    {
+                        lblParameterOne.Text = "Seconds 0-99";
+                        lblParameterOne.Visible = true;
+                        txbParameterOne.Visible = true;
+                    }
+                    break;
+                case hm1xConstants.hm1xEnumCommands.ConnectToDiscoveredDevice:
+                    lblParameterOne.Text = "Device #0-99";
+                    lblParameterOne.Visible = true;
+                    txbParameterOne.Visible = true;
+                    break;
+                case hm1xConstants.hm1xEnumCommands.AdvertizingFlag:
+                    lblParameterOne.Text = "Byte (FF)";
+                    lblParameterOne.Visible = true;
+                    txbParameterOne.Visible = true;
+                    break;
+
             }
         }
     }

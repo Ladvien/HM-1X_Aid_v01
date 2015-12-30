@@ -65,7 +65,7 @@ namespace HM_1X_Aid_v01
             "iBeacon Mode",
             "Remove Bond Information",
             "Advertizing Flag",
-            "Connect to HM1X Only",
+            "Connect to HM Only (deprecated)",
             "Flow Control Switch",
             "RX Gain",
             "Help",
@@ -115,7 +115,6 @@ namespace HM_1X_Aid_v01
         public string getCommandStringFromEnum(hm1xConstants.hm1xEnumCommands enumeratedSelection)
         {
             string returnString = hm1xCommandsString[(int)enumeratedSelection];
-            Console.WriteLine(returnString);
             return returnString;
         }
     }
@@ -391,17 +390,97 @@ namespace HM_1X_Aid_v01
                     break;
                 //"AT+COL",
                 case hm1xConstants.hm1xEnumCommands.PIOState:
-
+                    atCommandList.Add("??");
+                    settingsExplained.Items.Add("Get Pin IO State");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
                     break;
                 //"AT+CYC", 
+                case hm1xConstants.hm1xEnumCommands.PIOCollectionRate:
+                    atCommandList.Add("??");
+                    settingsExplained.Items.Add("Get Pin IO Collection Rate");
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Set Pin IO Collection Rate");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+DISC", 
+                case hm1xConstants.hm1xEnumCommands.StartDiscovery:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Start Discovery");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+DISI", 
+                ///////////////////////////////////////////////////////////////////////////////////////////////////
+                ////////////////////////////////////Must Finish After Upgrade//////////////////////////////////////
+
+                // Requires v539
+                case hm1xConstants.hm1xEnumCommands.StartiBeaconDiscovery:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Start Discovery");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
+
+                ///////////////////////////////////////////////////////////////////////////////////////////////////
+                ///////////////////////////////////////////////////////////////////////////////////////////////////
                 //"AT+CONN", 
+                case hm1xConstants.hm1xEnumCommands.ConnectToDiscoveredDevice:
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Connect to Device Number...");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+DELO", 
+                case hm1xConstants.hm1xEnumCommands.iBeaconMode:
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Allowed to broadcast and scan");
+                    atCommandList.Add("2");
+                    settingsExplained.Items.Add("Only allow broadcast");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+ERASE", 
+                case hm1xConstants.hm1xEnumCommands.RemoveBondInfo:
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Remove bond info");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+FLAG", 
+                case hm1xConstants.hm1xEnumCommands.AdvertizingFlag:
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Set Advertizing Byte");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+FILT", 
+                case hm1xConstants.hm1xEnumCommands.HM1XConnectionFilter:
+                    settingsExplained.Enabled = false;
+                     /*
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Deprecated since v530");
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Filter Setting");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Find all BLE Devices");
+                    atCommandList.Add("2");
+                    settingsExplained.Items.Add("Find only HM Modules");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;*/
+                    break;
                 //"AT+FIOW", 
+                case hm1xConstants.hm1xEnumCommands.FlowControlSwitch:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get flow control setting");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Get flow control ON");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Get flow control OFF");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+GAIN",
                 //"AT+HELP
                 //"AT+IMME
@@ -468,8 +547,17 @@ namespace HM_1X_Aid_v01
                 case hm1xConstants.hm1xEnumCommands.TryConnectionAddress:
                     millisecondsReturned = 12000;
                     break;
+                case hm1xConstants.hm1xEnumCommands.PIOState:
+                    millisecondsReturned = 450;
+                    break;
+                case hm1xConstants.hm1xEnumCommands.ConnectToDiscoveredDevice:
+                    millisecondsReturned = 120000;
+                    break;
+                case hm1xConstants.hm1xEnumCommands.iBeaconMode:
+                    millisecondsReturned = 12000;
+                    break;
                 default:
-                    millisecondsReturned = 250;
+                    millisecondsReturned = 300;
                     break;
             }
             return millisecondsReturned;
@@ -559,17 +647,17 @@ namespace HM_1X_Aid_v01
                         }
 
                         // Make sure all four characters are in HEX range.
-                        char[] charArray = parameterOne.Text.ToCharArray();
+                        char[] hexCheckCharArray = parameterOne.Text.ToCharArray();
                         for(int i = 0; i < 4; i++)
                         {
-                            if(charArray[i] > 'F') { charArray[i] = 'F'; }
-                            else if (charArray[i] < '0') { charArray[i] = '0'; }
+                            if(hexCheckCharArray[i] > 'F') { hexCheckCharArray[i] = 'F'; }
+                            else if (hexCheckCharArray[i] < '0') { hexCheckCharArray[i] = '0'; }
                         }
 
                         // Make sure the first and last characters are valid.
-                        if(charArray[3] > 'E') { charArray[3] = 'E'; }
-                        if (charArray[3] < '1') { charArray[3] = '1'; }
-                        parameterOne.Text = "0x" + new string(charArray);
+                        if(hexCheckCharArray[3] > 'E') { hexCheckCharArray[3] = 'E'; }
+                        if (hexCheckCharArray[3] < '1') { hexCheckCharArray[3] = '1'; }
+                        parameterOne.Text = "0x" + new string(hexCheckCharArray);
 
                     }
                     else
@@ -581,9 +669,97 @@ namespace HM_1X_Aid_v01
                 case hm1xConstants.hm1xEnumCommands.TryConnectionAddress:
                     parameterOne.Text = conformMACAddress(parameterOne.Text);
                     break;
+                case hm1xConstants.hm1xEnumCommands.PIOCollectionRate:
+                    if (settingsSelection > 0)
+                    {
+                        parameterOne.Text = parameterOne.Text.ToUpper();
+                        // If there are less than four chars, pad with '0';
+                        int characteristicCharCount = parameterOne.Text.Count();
+                        Console.WriteLine(characteristicCharCount);
+                        if (characteristicCharCount < 2)
+                        {
+                            for (int i = 0; i < (2 - characteristicCharCount); i++)
+                            {
+                                parameterOne.Text += "0";
+                            }
+                        }
+                        else if (characteristicCharCount > 2)  // If there are more than four characters, trim it.
+                        {
+                            parameterOne.Text = parameterOne.Text.Remove(2, characteristicCharCount - 2);
+                        }
+
+                        // Make sure all four characters are in HEX range.
+                        char[] charArrayPIOCollectionRate = parameterOne.Text.ToCharArray();
+                        for (int i = 0; i < 2; i++)
+                        {
+                            if (charArrayPIOCollectionRate[i] > '9') { charArrayPIOCollectionRate[i] = '9'; }
+                            else if (charArrayPIOCollectionRate[i] < '0') { charArrayPIOCollectionRate[i] = '0'; }
+                        }
+                        parameterOne.Text = new string(charArrayPIOCollectionRate);
+                    }
+                    else
+                    {
+                        // Must clear the parameter box or it will intefer with other commands.S
+                        parameterOne.Text = "";
+                    }
+                    break;
+                case hm1xConstants.hm1xEnumCommands.ConnectToDiscoveredDevice:
+                    parameterOne.Text = parameterOne.Text.ToUpper();
+                    // If there are less than four chars, pad with '0';
+                    int charCount = parameterOne.Text.Count();
+                    Console.WriteLine(charCount);
+
+                    // Make sure all four characters are in HEX range.
+                    char[] charArray = parameterOne.Text.ToCharArray();
+                    if (charCount > 2)  // If there are more than four characters, trim it.
+                    {
+                        parameterOne.Text = parameterOne.Text.Remove(2, charCount - 2);
+                    }
+                    else if (charCount == 1) // If there is only one char, let's make it 1-9.
+                    {
+                        for (int i = 0; i < 1; i++)
+                        {
+                            if (charArray[i] > '9') { charArray[i] = '9'; }
+                            else if (charArray[i] < '0') { charArray[i] = '0'; }
+                        }
+                        parameterOne.Text = new string(charArray);
+                    } else if (charCount == 0)// Else, default to "0"
+                    {
+                        parameterOne.Text = "0";
+                    }
+                    else  // This number is just right (has to be two or negative digits)
+                    {
+                        parameterOne.Text = new string(charArray);
+                    }
+                    break;
+                case hm1xConstants.hm1xEnumCommands.AdvertizingFlag:
+                    parameterOne.Text = parameterOne.Text.ToUpper();
+                    // If there are less than four chars, pad with '0';
+                    int advFlagCharCount = parameterOne.Text.Count();
+                    if (advFlagCharCount < 2)
+                    {
+                        for (int i = 0; i < (1 - advFlagCharCount); i++)
+                        {
+                            parameterOne.Text += "0";
+                        }
+                    }
+                    else if (advFlagCharCount > 2)  // If there are more than four characters, trim it.
+                    {
+                        parameterOne.Text = parameterOne.Text.Remove(2, advFlagCharCount - 2);
+                    }
+
+                    // Make sure all four characters are in HEX range.
+                    char[] advFlagCheckCharArray = parameterOne.Text.ToCharArray();
+                    for (int i = 0; i < 2; i++)
+                    {
+                        if (advFlagCheckCharArray[i] > 'F') { advFlagCheckCharArray[i] = 'F'; }
+                        else if (advFlagCheckCharArray[i] < '0') { advFlagCheckCharArray[i] = '0'; }
+                    }
+
+                    parameterOne.Text = new string(advFlagCheckCharArray);
+                    break;
             }
         }
-
 
         // Borrowed from SO.
         // http://stackoverflow.com/questions/5612306/converting-long-string-of-binary-to-hex-c-sharp
@@ -625,9 +801,10 @@ namespace HM_1X_Aid_v01
             {
                 returnString = returnString.Remove(12, macAddressCharCount - 12);
             }
-            Console.WriteLine(address);
+
             return returnString;
         }
+
     } // End hm1xSettings
 
 } // End Namespace
