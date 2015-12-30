@@ -51,12 +51,11 @@ namespace HM_1X_Aid_v01
 
             // Setup display.
             lblConnectionStatus.BackColor = Color.Red;
-
         }
 
         private void loadSettings()
         {
-            serialSystemUpdate(this, "Loading settings.\n", 0, Color.LimeGreen);
+            serialSystemUpdate(this, "Loading settings.\r\n", 0);
             if (cmbPortNumberInPortSettingsTab.Items.Count > 0)
             {
                 cmbPortNumberInPortSettingsTab.SelectedIndex = Properties.Settings.Default.lastCom;
@@ -76,12 +75,12 @@ namespace HM_1X_Aid_v01
                 cmbHM1XCommands.SelectedIndex = Properties.Settings.Default.hm1xCommand;
             }
             
-            serialSystemUpdate(this, "Loaded settings.\n", 100, Color.LimeGreen);
+            serialSystemUpdate(this, "Loaded settings.\r\n", 100);
         }
 
         private void saveSettings()
         {
-            serialSystemUpdate(this, "Saving settings.\n", 0, Color.LimeGreen);
+            serialSystemUpdate(this, "Saving settings.\r\n", 0);
             Properties.Settings.Default.lastCom = cmbPortNumberInPortSettingsTab.SelectedIndex;
             Properties.Settings.Default.BaudRate = cmbBaudRatePortSettingsTab.SelectedIndex;
             Properties.Settings.Default.dataBits = cmbDataBitsPortSettingsTab.SelectedIndex;
@@ -95,12 +94,12 @@ namespace HM_1X_Aid_v01
             Properties.Settings.Default.hm1xCommand = cmbHM1XCommands.SelectedIndex;
             Properties.Settings.Default.bottomAreaTab = tbcBottomPane.SelectedIndex;
             Properties.Settings.Default.Save();
-            serialSystemUpdate(this, "Saved settings.\n", 100, Color.LimeGreen);
+            serialSystemUpdate(this, "Saved settings.\r\n", 100);
         }
 
         private void resetSettings()
         {
-            serialSystemUpdate(this, "Clearing settings.\n", 0, Color.LimeGreen);
+            serialSystemUpdate(this, "Clearing settings.\r\n", 0);
             Properties.Settings.Default.lastCom = 0;
             Properties.Settings.Default.BaudRate = 0;
             Properties.Settings.Default.dataBits = 0;
@@ -113,7 +112,7 @@ namespace HM_1X_Aid_v01
             Properties.Settings.Default.moduleType = 0;
             Properties.Settings.Default.hm1xCommand = 0;
             Properties.Settings.Default.Save();
-            serialSystemUpdate(this, "Cleared.\n", 100, Color.LimeGreen);
+            serialSystemUpdate(this, "Cleared.\r\n", 100);
         }
 
         void setText(string text)
@@ -152,11 +151,12 @@ namespace HM_1X_Aid_v01
         }
 
 
-        public void serialSystemUpdate(object sender, string text, int progressBarValue, Color progressBarColor)
+        public void serialSystemUpdate(object sender, string text, int progressBarValue)
         {
             addSysMsgText(text);
+            txbSysMsg.SelectionStart = txbSysMsg.Text.Length + 10;
+            txbSysMsg.ScrollToCaret();
             pbSysStatus.Value = progressBarValue;
-            pbSysStatus.BackColor = progressBarColor;
         }
 
         // This is the callback method run each time the tempBuffer changes.
@@ -192,7 +192,7 @@ namespace HM_1X_Aid_v01
 
         private void loadCOMInfo()
         {
-            //serialSystemUpdate(this, "Loading COM info.\n", 0, Color.LimeGreen);
+            //serialSystemUpdate(this, "Loading COM info.\n", 0);
             clearMainDisplay();
             clearSerialPortMenu();
             
@@ -225,7 +225,7 @@ namespace HM_1X_Aid_v01
                 serialPortsToolStripMenuItem.DropDownItems.Add(subItem);
                 cmbPortNumberInPortSettingsTab.Items.Add(portInfo);
             });
-            serialSystemUpdate(this, "", 50, Color.LimeGreen);
+            serialSystemUpdate(this, "", 50);
             if (portList.Count > 0)
             {
                 togglePortMenu(true);
@@ -246,7 +246,7 @@ namespace HM_1X_Aid_v01
                 loadSettings();
 
             }
-            serialSystemUpdate(this, "Loaded COM info.\n", 100, Color.LimeGreen);
+            serialSystemUpdate(this, "Loaded COM info.\r\n", 100);
         }
 
         private void HM1XSettingsBoxChanged(object sender, EventArgs e)
@@ -338,8 +338,8 @@ namespace HM_1X_Aid_v01
 
         private void addSysMsgText(string text)
         {
-            txbSysMsg.AppendText(text);
-            txbSysMsg.ScrollToCaret();
+            txbSysMsg.Text += text;
+             txbSysMsg.ScrollToCaret();
         }
 
         private void setSysMsgText(string text)
@@ -425,6 +425,7 @@ namespace HM_1X_Aid_v01
             }
             else // If connceted, disconnect.
             {
+                serialPorts.closePort();
                 togglePortMenu(true);
                 btnConnectHM1X.Enabled = false;
                 serialPorts.updateConnectionLabel(lblConnectionStatus);
@@ -433,7 +434,7 @@ namespace HM_1X_Aid_v01
                 cmbHM1XSettings.Enabled = false;
                 btnConfirmHM1XSetting.Enabled = false;
                 serialPorts.clearCaptureFlag();
-                serialPorts.closePort();
+                
             }
         }
 
@@ -470,7 +471,7 @@ namespace HM_1X_Aid_v01
                 }
                 else
                 {
-                    addSysMsgText("Invalid hex string.\n");
+                    addSysMsgText("Invalid hex string.\r\n");
                     result = txbSendTextBox.Text;
                     return;
                 }
@@ -554,7 +555,8 @@ namespace HM_1X_Aid_v01
         {
             cmbHM1XSettings.Items.Clear();
             serialPorts.clearSettingsList();
-        }
+            serialPorts.commandSelectedMessage(rtbMainDisplay, (hm1xConstants.hm1xEnumCommands)cmbHM1XCommands.SelectedIndex);
+    }
 
         private void cmbHM1XSettings_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -571,6 +573,9 @@ namespace HM_1X_Aid_v01
             /// Keep it DRY.  The PowerOn and AfterConnection are the same case.
             if (selectedEnumeration == hm1xConstants.hm1xEnumCommands.PIOStateAfterConnection) { selectedEnumeration = hm1xConstants.hm1xEnumCommands.PIOStateAfterPowerOn; }
 
+            // Default the response timeout.
+            serialPorts.setResponseTimeout(250);
+
             switch (selectedEnumeration)
             {
                 case hm1xConstants.hm1xEnumCommands.WhitelistMACAddress:
@@ -579,6 +584,8 @@ namespace HM_1X_Aid_v01
                         txbParameterOne.Visible = true;
                         lblParameterOne.Text = "MAC Address (12 digits)";
                         lblParameterOne.Visible = true;
+                        // Default the response timeout.
+                        serialPorts.setResponseTimeout(250);
                     }
                     break;
                 case hm1xConstants.hm1xEnumCommands.PIOStateAfterPowerOn:
@@ -589,8 +596,26 @@ namespace HM_1X_Aid_v01
                         lblParameterTwo.Text = "Pin 0 to B";
                         lblParameterOne.Visible = true;
                         lblParameterTwo.Visible = true;
+                        // Default the response timeout.
+                        serialPorts.setResponseTimeout(250);
                     }
                     break;
+                case hm1xConstants.hm1xEnumCommands.Characteristic:
+                    if (cmbHM1XSettings.SelectedIndex > 0)
+                    {
+                        txbParameterOne.Visible = true;
+                        lblParameterOne.Text = "Char as HEX (4)";
+                        lblParameterOne.Visible = true;
+                        // Default the response timeout.
+                        serialPorts.setResponseTimeout(250);
+                    }
+                    break;
+                case hm1xConstants.hm1xEnumCommands.TryConnectionAddress:
+                    lblParameterOne.Text = "MAC Address (12 digits)";
+                    lblParameterOne.Visible = true;
+                    txbParameterOne.Visible = true;
+                    break;
+                
             }
         }
     }

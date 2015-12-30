@@ -12,12 +12,12 @@ namespace HM_1X_Aid_v01
 
 
         public static string[] hm1xCommandsString = {"None", "AT", "AT+ADC", "AT+ADDR","AT+ADVI","AT+ADTY","AT+ANCS","AT+ALLO","AT+AD","AT+BEFC","AT+AFTC","AT+BATC","AT+BATT",
-                                   "AT+BIT7","AT+BAUD","AT+COMI","AT+COMA","AT+COLA","AT+COUP","AT+CHAR", "AT+CLEAR","AT+CONL","AT+CO","AT+COL",
+                                   "AT+BIT7","AT+BAUD","AT+COMI","AT+COMA","AT+COLA","AT+COUP","AT+CHAR", "AT+CLEAR","AT+CONNL","AT+CO","AT+COL",
                                    "AT+CYC", "AT+DISC", "AT+DISI", "AT+CONN", "AT+DELO", "AT+ERASE", "AT+FLAG", "AT+FILT", "AT+FIOW", "AT+GAIN",
                                    "AT+HELP", "AT+IMME", "AT+IBEA", "AT+BEA0", "AT+BEA1", "AT+BEA2", "AT+BEA3", "AT+MARJ", "AT+MINO", "AT+MEAS",
                                    "AT+MODE", "AT+NOTI", "AT+NOTP", "AT+NAME", "AT+PCTL", "AT+PARI", "AT+PIO", "AT+PASS", "AT+PIN", "AT+POWE",
                                    "AT+PWRM", "AT+RELI", "AT+RENEW", "AT+RESTART", "AT+ROLE", "AT+RSSI", "AT+RADD", "AT+RAT", "AT+STOP", "AT+START",
-                                   "AT+SLEEP", "AT+SAVE", "AT+SENS", "AT+SHOW", "AT+TEHU", "AT+TEMP", "AT+TCON", "AT+TYPE", "AT+UUID", "AT+UART","AT+VERS" };
+                                   "AT+SLEEP", "AT+SAVE", "AT+SENS", "AT+SHOW", "AT+TEHU", "AT+TEMP", "AT+TCON", "AT+TYPE", "AT+UUID", "AT+UART","AT+VERS", "ERROR"};
 
         public enum hm1xEnumCommands : int
         {
@@ -27,7 +27,7 @@ namespace HM_1X_Aid_v01
             AdvertizingFlag, HM1XConnectionFilter, FlowControlSwitch, RXGain, Help, WorkType, iBeaconModeSwitch, iBeaconUUID0, iBeaconUUID1, iBeaconUUID2, iBeaconUUID3,
             iBeaconMajorVersion, iBeaconMinorVersion, iBeaconMeasuredPower, WorkMode, ConnectionNotification, ConnNotificationMode, Name, OutputDriver, Parity, ConnectionLEDMode, SetPIOTemp, Pin,
             PowerLevel, SleepType, ReliableAdvertizing, Renew, Reset, Role, RSSI, LastConnectedAddress, SensorWorkInterval, StopBits, StartWork, Sleep, SaveConnectedAddress, SensorType,
-            DiscoveryParameter, TemperatureSensor, ICTemperature, RemoteDeviceTimeout, BondType, Service, WakeThroughUART, Version
+            DiscoveryParameter, TemperatureSensor, ICTemperature, RemoteDeviceTimeout, BondType, Service, WakeThroughUART, Version, ERROR
         }
 
         public enum hm1xDeviceType : int { Unknown = 0, HM10 = 1, HM11 = 2, HM15 = 3 };
@@ -108,10 +108,18 @@ namespace HM_1X_Aid_v01
             "Bond Type",
             "Service",
             "Wake Through UART",
-            "Version"
+            "Version",
+            "ERROR"
         };
-    }
 
+        public string getCommandStringFromEnum(hm1xConstants.hm1xEnumCommands enumeratedSelection)
+        {
+            string returnString = hm1xCommandsString[(int)enumeratedSelection];
+            Console.WriteLine(returnString);
+            return returnString;
+        }
+    }
+    
     public class hm1xSettings
     {
         public void getSettingsHM10(ComboBox settingsExplained, List<string> atCommandList, hm1xConstants.hm1xEnumCommands command,
@@ -131,6 +139,10 @@ namespace HM_1X_Aid_v01
                     break;
                 //"None"
                 case hm1xConstants.hm1xEnumCommands.None:
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("None");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
                     settingsExplained.Enabled = false;
                     break;
                 //"AT+ADC"
@@ -158,7 +170,7 @@ namespace HM_1X_Aid_v01
                     else
                     {
                         atCommandList.Add("");
-                        settingsExplained.Items.Add(deviceType.ToString() + " does not support this feature.");
+                        settingsExplained.Items.Add(deviceType.ToString() + " does not support this feature");
                         confirmButton.Enabled = false;
                         settingsExplained.Enabled = false;
                     }
@@ -334,19 +346,53 @@ namespace HM_1X_Aid_v01
                     settingsExplained.Items.Add("Set Baud to 1200");
                     atCommandList.Add("8");
                     settingsExplained.Items.Add("Set Baud to 230400");
-
                     settingsExplained.Enabled = true;
                     settingsExplained.SelectedIndex = 0;
                     break;
                 //"AT+COMI",
+                    // Will Add after upgrade.
                 //"AT+COMA",
+                    // Will Add after upgrade.
                 //"AT+COLA",
+                    // Will Add after upgrade.
                 //"AT+COUP",
+                    // Will Add after upgrade.
                 //"AT+CHAR", 
+                case hm1xConstants.hm1xEnumCommands.Characteristic:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Current Characteristic Value");
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Set Characteristic Value");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+CLEAR",
-                //"AT+CONL",
+                case hm1xConstants.hm1xEnumCommands.ClearLastConnected:
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Clear last connected device bond");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
+                //"AT+CONNL",
+                case hm1xConstants.hm1xEnumCommands.TryLastConnected:
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Try to connect to last connected device");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+CO",
+                case hm1xConstants.hm1xEnumCommands.TryConnectionAddress:
+                    atCommandList.Add("N");
+                    settingsExplained.Items.Add("Bluetooth Low Energy Address");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Dual Module Address");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+COL",
+                case hm1xConstants.hm1xEnumCommands.PIOState:
+
+                    break;
                 //"AT+CYC", 
                 //"AT+DISC", 
                 //"AT+DISI", 
@@ -417,25 +463,13 @@ namespace HM_1X_Aid_v01
         {
             /// Keep it DRY.  The PowerOn and AfterConnection are the same case.
             if(selectedEnumeration == hm1xConstants.hm1xEnumCommands.PIOStateAfterConnection) { selectedEnumeration = hm1xConstants.hm1xEnumCommands.PIOStateAfterPowerOn; }
+            
             switch (selectedEnumeration)
             {
                 case hm1xConstants.hm1xEnumCommands.WhitelistMACAddress:
                     if (settingsSelection > 2)
                     {
-                        int macAddressCharCount = parameterOne.Text.Count();
-                        if (macAddressCharCount < 12)
-                        {
-                            for (int i = 0; i < (12 - macAddressCharCount); i++)
-                            {
-                                parameterOne.Text += "0";
-                            }
-                        }
-                        else if (macAddressCharCount > 12)
-                        {
-                            Console.WriteLine(macAddressCharCount);
-                            Console.WriteLine(macAddressCharCount - 12);
-                            parameterOne.Text = parameterOne.Text.Remove(12, macAddressCharCount - 12);
-                        }
+                        conformMACAddress(parameterOne.Text);
                     }
                     else
                     {
@@ -448,6 +482,7 @@ namespace HM_1X_Aid_v01
                     // Check to make sure we got a combobox index.
                     if (settingsSelection > 0)
                     {
+                        parameterOne.Text = parameterOne.Text.ToUpper();
                         // Turn all the "bits" into a charArray to check each of their validity.
                         char[] trueBitCharArray = parameterOne.Text.ToCharArray();
                         for (int i = 0; i < trueBitCharArray.Count(); i++)
@@ -489,6 +524,47 @@ namespace HM_1X_Aid_v01
                         parameterOne.Text = "";
                     }
                     break;
+                case hm1xConstants.hm1xEnumCommands.Characteristic:
+                    if (settingsSelection > 0)
+                    {
+                        parameterOne.Text = parameterOne.Text.ToUpper();
+                        // If there are less than four chars, pad with '0';
+                        int characteristicCharCount = parameterOne.Text.Count();
+                        if (characteristicCharCount < 4)
+                        {
+                            for (int i = 0; i < (4 - characteristicCharCount); i++)
+                            {
+                                parameterOne.Text += "0";
+                            }
+                        }
+                        else if (characteristicCharCount > 4)  // If there are more than four characters, trim it.
+                        {
+                            parameterOne.Text = parameterOne.Text.Remove(4, characteristicCharCount - 4);
+                        }
+
+                        // Make sure all four characters are in HEX range.
+                        char[] charArray = parameterOne.Text.ToCharArray();
+                        for(int i = 0; i < 4; i++)
+                        {
+                            if(charArray[i] > 'F') { charArray[i] = 'F'; }
+                            else if (charArray[i] < '0') { charArray[i] = '0'; }
+                        }
+
+                        // Make sure the first and last characters are valid.
+                        if(charArray[3] > 'E') { charArray[3] = 'E'; }
+                        if (charArray[3] < '1') { charArray[3] = '1'; }
+                        parameterOne.Text = "0x" + new string(charArray);
+
+                    }
+                    else
+                    {
+                        // Must clear the parameter box or it will intefer with other commands.S
+                        parameterOne.Text = "";
+                    }
+                    break;
+                case hm1xConstants.hm1xEnumCommands.TryConnectionAddress:
+                    conformMACAddress(parameterOne.Text);
+                    break;
             }
         }
 
@@ -517,6 +593,23 @@ namespace HM_1X_Aid_v01
             return result.ToString();
         }
 
+        private void conformMACAddress(string address)
+        {
+            address = address.ToUpper();
+            int macAddressCharCount = address.Count();
+            if (macAddressCharCount < 12)
+            {
+                for (int i = 0; i < (12 - macAddressCharCount); i++)
+                {
+                    address += "0";
+                }
+            }
+            else if (macAddressCharCount > 12)
+            {
+                address = address.Remove(12, macAddressCharCount - 12);
+            }
+            Console.WriteLine(address);
+        }
     } // End hm1xSettings
 
 } // End Namespace
