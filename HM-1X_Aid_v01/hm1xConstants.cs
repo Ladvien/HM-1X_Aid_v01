@@ -16,7 +16,7 @@ namespace HM_1X_Aid_v01
                                    "AT+CYC", "AT+DISC", "AT+DISI", "AT+CONN", "AT+DELO", "AT+ERASE", "AT+FLAG", "AT+FILT", "AT+FIOW", "AT+GAIN",
                                    "AT+HELP", "AT+IMME", "AT+IBEA", "AT+BEA0", "AT+BEA1", "AT+BEA2", "AT+BEA3", "AT+MARJ", "AT+MINO", "AT+MEAS",
                                    "AT+MODE", "AT+NOTI", "AT+NOTP", "AT+NAME", "AT+PCTL", "AT+PARI", "AT+PIO1", "AT+PIO", "AT+PASS", "AT+POWE",
-                                   "AT+PWRM", "AT+RELI", "AT+RENEW", "AT+RESTART", "AT+ROLE", "AT+RSSI", "AT+RADD", "AT+RAT", "AT+STOP", "AT+START",
+                                   "AT+PWRM", "AT+RELI", "AT+RENEW", "AT+RESET", "AT+ROLE", "AT+RSSI", "AT+RADD", "AT+RAT", "AT+STOP", "AT+START",
                                    "AT+SLEEP", "AT+SAVE", "AT+SENS", "AT+SHOW", "AT+TEHU", "AT+TEMP", "AT+TCON", "AT+TYPE", "AT+UUID", "AT+UART","AT+VERS", "ERROR"};
 
         public enum hm1xEnumCommands : int
@@ -712,11 +712,59 @@ namespace HM_1X_Aid_v01
                     settingsExplained.SelectedIndex = 0;
                     break;
                 //"AT+PWRM
+                case hm1xConstants.hm1xEnumCommands.SleepType:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get sleep type");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set to Auto-Sleep");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set to NOT Auto-Sleep");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+RELI
+                case hm1xConstants.hm1xEnumCommands.ReliableAdvertizing:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Advertizing Reliability Mode");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set to Normal Advertizing Reliability");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set Reliable Advertizing");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+RENEW
+                case hm1xConstants.hm1xEnumCommands.Renew:
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Set to Factory Default");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+RESTART
+                case hm1xConstants.hm1xEnumCommands.Reset:
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Turn's it Off and On Again");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+ROLE
+                case hm1xConstants.hm1xEnumCommands.Role:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Role");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set Role to Peripheral");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set Role to Central");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+RSSI
+                case hm1xConstants.hm1xEnumCommands.RSSI:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get RSSI");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+RADD
                 case hm1xConstants.hm1xEnumCommands.LastConnectedAddress:
                     atCommandList.Add("?");
@@ -725,15 +773,88 @@ namespace HM_1X_Aid_v01
                     settingsExplained.SelectedIndex = 0;
                     break;
                 //"AT+RAT
-
+                case hm1xConstants.hm1xEnumCommands.SensorWorkInterval:
+                    if(deviceType == hm1xConstants.hm1xDeviceType.HM15)
+                    {
+                        atCommandList.Add("??");
+                        settingsExplained.Items.Add("Get Sensor Interval");
+                        atCommandList.Add("");
+                        settingsExplained.Items.Add("Set Sensor Interval");
+                        settingsExplained.Enabled = true;
+                        settingsExplained.SelectedIndex = 0;
+                    }
+                    break;
                 //"AT+STOP
+                case hm1xConstants.hm1xEnumCommands.StopBits:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Stop Bits Setting");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set to One Stop Bit");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set to Two Stop Bit");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+START
+                case hm1xConstants.hm1xEnumCommands.StartWork:
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Start Serial Transmission Mode");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+SLEEP
+                case hm1xConstants.hm1xEnumCommands.Sleep:
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Send to Module to Sleep");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+SAVE
+                case hm1xConstants.hm1xEnumCommands.SaveConnectedAddress:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get whether address is saved on connect");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set to save address when connection's successful");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set to NOT save address when connection's successful");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+SENS
+                case hm1xConstants.hm1xEnumCommands.SensorType:
+                ////////// NOT IMPLEMENTED /////////////
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("NOT IMPLEMENTED");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+SHOW
+                case hm1xConstants.hm1xEnumCommands.DiscoveryParameter:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get whether names are shown after discovery");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set NOT to show names during search");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set to show names during search");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+TEHU
+                case hm1xConstants.hm1xEnumCommands.TemperatureSensor:
+                    ////////// NOT IMPLEMENTED /////////////
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("NOT IMPLEMENTED");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
+
                 //"AT+TEMP
+                case hm1xConstants.hm1xEnumCommands.ICTemperature:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get IC Temperature or DS18B20 (HM-Sensor)");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+TCON
                 //"AT+TYPE
                 //"AT+UUID

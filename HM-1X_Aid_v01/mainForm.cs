@@ -583,6 +583,9 @@ namespace HM_1X_Aid_v01
             // Default the response timeout.
             serialPorts.setResponseTimeout(250);
 
+            cmbHM1XCommands.Enabled = true;
+            cmbHM1XSettings.Enabled = true;
+
             switch (selectedEnumeration)
             {
                 case hm1xConstants.hm1xEnumCommands.WhitelistMACAddress:
@@ -655,10 +658,15 @@ namespace HM_1X_Aid_v01
                         txbParameterOne.Visible = true;
                     }
                     break;
+                case hm1xConstants.hm1xEnumCommands.SensorWorkInterval:
+                    if(cmbHM1XSettings.SelectedIndex > 0)
+                    {
+                        lblParameterOne.Text = "0-99 seconds";
+                        lblParameterOne.Visible = true;
+                        txbParameterOne.Visible = true;
+                    }
+                    break;
             }
         }
     }
-
-
-
 }

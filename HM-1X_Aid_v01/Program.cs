@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.IO.Ports;
 using HM_1X_Aid_v01;
+using System.Globalization;
 
 namespace HM_1X_Aid_v01
 {
@@ -724,24 +725,24 @@ class SerialPortsExtended: SerialPort
                 label.Text = "Connected";
                 label.BackColor = Color.LimeGreen;
                 progressBar.BackColor = Color.LimeGreen;
-                mainDisplay.Text += "Connected\r\n";
+                mainDisplay.AppendText("Connected\r\n", Color.LimeGreen);
                 setHM1XConnection();
                 finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.Version:
-                mainDisplay.Text += "Firmware version: " + value.ToString() + "\r\n";
+                mainDisplay.AppendText("Firmware version: " + value.ToString() + "\r\n", Color.LimeGreen);
                 finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.ADC:
                 valueString = valueString.Replace("OK+ADC", "Pin IO #");
                 valueString += "\r\n";
-                mainDisplay.Text += valueString;
+                mainDisplay.AppendText(valueString, Color.LimeGreen);
                 finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.MACAddress:
                 valueString = valueString.Replace("OK+ADDR:", "MAC Address: ");
                 valueString += "\r\n";
-                mainDisplay.Text += valueString;
+                mainDisplay.AppendText(valueString, Color.LimeGreen);
                 finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.AdvertizingInterval:
@@ -753,7 +754,7 @@ class SerialPortsExtended: SerialPort
                     valueString = valueString.Replace("OK+Set:", "Set advertizing interval: ");
                 }
                 valueString += "\r\n";
-                mainDisplay.Text += valueString;
+                mainDisplay.AppendText(valueString, Color.LimeGreen);
                 finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.AdvertizingType:
@@ -787,7 +788,7 @@ class SerialPortsExtended: SerialPort
                         break;
                 }
                 valueString += "\r\n";
-                mainDisplay.Text += valueString;
+                mainDisplay.AppendText(valueString, Color.LimeGreen);
                 finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.ANCS:
@@ -807,7 +808,7 @@ class SerialPortsExtended: SerialPort
                         break;
                 }
                 valueString += "\r\n";
-                mainDisplay.Text += valueString;
+                mainDisplay.AppendText(valueString, Color.LimeGreen);
                 finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.LastConnectedAddress:
@@ -819,7 +820,7 @@ class SerialPortsExtended: SerialPort
                     // Error
                 }  
                 valueString += "\r\n";
-                mainDisplay.Text += valueString;
+                mainDisplay.AppendText(valueString, Color.LimeGreen);
                 finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.WhiteListSwitch:
@@ -838,7 +839,7 @@ class SerialPortsExtended: SerialPort
                         break;
                 }
                 valueString += "\r\n";
-                mainDisplay.Text += valueString;
+                mainDisplay.AppendText(valueString, Color.LimeGreen);
                 finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.WhitelistMACAddress:
@@ -869,7 +870,7 @@ class SerialPortsExtended: SerialPort
 
                 valueString = macAddress;
                 valueString += "\r\n";
-                mainDisplay.Text += valueString;
+                mainDisplay.AppendText(valueString, Color.LimeGreen);
                 finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.PIOStateAfterPowerOn:
@@ -884,14 +885,14 @@ class SerialPortsExtended: SerialPort
 
                     for (int i = 11; i > -1; i--)
                     {
-                        mainDisplay.Text += pinInfo[i];
+                        mainDisplay.AppendText(pinInfo[i], Color.LimeGreen);
                         if (IsBitSet((byte)endianCorrectedByte, i))
                         {
-                            mainDisplay.Text += " was set HIGH.\r\n";
+                            mainDisplay.AppendText(" was set HIGH.\r\n", Color.LimeGreen);
                         }
                         else
                         {
-                            mainDisplay.Text += " was set LOW.\r\n";
+                            mainDisplay.AppendText(" was set LOW.\r\n", Color.LimeGreen);
                         }
                     }
 
@@ -899,14 +900,14 @@ class SerialPortsExtended: SerialPort
                 {
                     for (int i = 11; i > -1; i--)
                     {
-                        mainDisplay.Text += pinInfo[i];
+                        mainDisplay.AppendText(pinInfo[i], Color.LimeGreen);
                         if (IsBitSet((byte)endianCorrectedByte, i))
                         {
-                            mainDisplay.Text += " after power on is set to HIGH.\r\n";   
+                            mainDisplay.AppendText(" after power on is set to HIGH.\r\n", Color.LimeGreen);
                         }
                         else
                         {
-                            mainDisplay.Text += " after power on is set to LOW.\r\n";
+                            mainDisplay.AppendText(" after power on is set to LOW.\r\n", Color.LimeGreen);
                         }
                     }
                 }
@@ -925,14 +926,14 @@ class SerialPortsExtended: SerialPort
 
                     for (int i = 11; i > -1; i--)
                     {
-                        mainDisplay.Text += pinInfo[i];
+                        mainDisplay.AppendText(pinInfo[i], Color.LimeGreen);
                         if (IsBitSet((byte)endianCorrectedByte, i))
                         {
-                            mainDisplay.Text += " was set HIGH.\r\n";
+                            mainDisplay.AppendText(" was set HIGH.\r\n", Color.LimeGreen);
                         }
                         else
                         {
-                            mainDisplay.Text += " was set LOW.\r\n";
+                            mainDisplay.AppendText(" was set LOW.\r\n", Color.LimeGreen);
                         }
                     }
 
@@ -941,14 +942,14 @@ class SerialPortsExtended: SerialPort
                 {
                     for (int i = 11; i > -1; i--)
                     {
-                        mainDisplay.Text += pinInfo[i];
+                        mainDisplay.AppendText(pinInfo[i], Color.LimeGreen);
                         if (IsBitSet((byte)endianCorrectedByte, i))
                         {
-                            mainDisplay.Text += " after connected is set to HIGH.\r\n";
+                            mainDisplay.AppendText(" after connected is set to HIGH.\r\n", Color.LimeGreen);
                         }
                         else
                         {
-                            mainDisplay.Text += " after connected on is set to LOW. \r\n";
+                            mainDisplay.AppendText(" after connected on is set to LOW. \r\n", Color.LimeGreen);
                         }
                     }
                 }
@@ -962,16 +963,16 @@ class SerialPortsExtended: SerialPort
                 switch (replySwitch)
                 {
                     case 0:
-                        mainDisplay.Text += "Battery monitor set OFF.\r\n";
+                        mainDisplay.AppendText("Battery monitor set OFF.\r\n", Color.LimeGreen);
                         break;
                     case 1:
-                        mainDisplay.Text += "Battery monitor set ON.\r\n";
+                        mainDisplay.AppendText("Battery monitor set ON.\r\n", Color.LimeGreen);
                         break;
                 }
                 finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.BatteryInformation:
-                mainDisplay.Text += "Battery Power: %" + valueString.Replace("OK+Get:", "") + "\r\n";
+                mainDisplay.AppendText("Battery Power: %" + valueString.Replace("OK+Get:", "") + "\r\n", Color.LimeGreen);  
                 finishedCommand();
                 break;
             case hm1xConstants.hm1xEnumCommands.BitFormat:
@@ -981,10 +982,10 @@ class SerialPortsExtended: SerialPort
                 switch (replySwitch)
                 {
                     case 0:
-                        mainDisplay.Text += "Set to 7-Bit NON-Compatible.\r\n";
+                        mainDisplay.AppendText("Set to 7-Bit NON-Compatible.\r\n", Color.LimeGreen);
                         break;
                     case 1:
-                        mainDisplay.Text += "Set to 7-Bit Compatible.\r\n";
+                        mainDisplay.AppendText("Set to 7-Bit Compatible.\r\n", Color.LimeGreen);
                         break;
                 }
                 finishedCommand();
@@ -997,36 +998,36 @@ class SerialPortsExtended: SerialPort
                 switch (replySwitch)
                 {
                     case 0:
-                        mainDisplay.Text += "Set to Baud 9600\r\n";
+                        mainDisplay.AppendText("Set to Baud 9600\r\n", Color.LimeGreen);
                         break;
                     case 1:
-                        mainDisplay.Text += "Set to Baud 19200\r\n";
+                        mainDisplay.AppendText("Set to Baud 19200\r\n", Color.LimeGreen);
                         break;
                     case 2:
-                        mainDisplay.Text += "Set to Baud 38400\r\n";
+                        mainDisplay.AppendText("Set to Baud 38400\r\n", Color.LimeGreen);
                         break;
                     case 3:
-                        mainDisplay.Text += "Set to Baud 57600\r\n";
+                        mainDisplay.AppendText("Set to Baud 57600\r\n", Color.LimeGreen);
                         break;
                     case 4:
-                        mainDisplay.Text += "Set to Baud 115200\r\n";
+                        mainDisplay.AppendText("Set to Baud 115200\r\n", Color.LimeGreen);
                         break;
                     case 5:
-                        mainDisplay.Text += "Set to Baud 4800\r\n";
+                        mainDisplay.AppendText("Set to Baud 4800\r\n", Color.LimeGreen);
                         break;
                     case 6:
-                        mainDisplay.Text += "Set to Baud 2400\r\n";
+                        mainDisplay.AppendText("Set to Baud 2400\r\n", Color.LimeGreen);
                         break;
                     case 7:
-                        mainDisplay.Text += "Set to Baud 1200\r\n";
+                        mainDisplay.AppendText("Set to Baud 1200\r\n", Color.LimeGreen);
                         break;
                     case 8:
-                        mainDisplay.Text += "Set to Baud 230400\r\n";
+                        mainDisplay.AppendText("Set to Baud 230400\r\n", Color.LimeGreen);
                         break;
                 }
                 if (isSet)
                 {
-                    mainDisplay.Text += "The module needs to be powered down before baud set is complete.\r\n";
+                    mainDisplay.AppendText("The module needs to be powered down before baud set is complete.\r\n", Color.LimeGreen);
                 }
                 finishedCommand();
                 break;
@@ -1036,10 +1037,10 @@ class SerialPortsExtended: SerialPort
                 
                 if(isSet)
                 {
-                    mainDisplay.Text += "Characteristic set to: " + valueString.Replace("OK+Set:", "") + "\r\n";
+                    mainDisplay.AppendText("Characteristic set to: " + valueString.Replace("OK+Set:", "") + "\r\n", Color.LimeGreen);
                 } else
                 {
-                    mainDisplay.Text += "Your characteristic setting is currently: " + valueString.Replace("OK+Get:", "") + "\r\n";
+                    mainDisplay.AppendText("Your characteristic setting is currently: " + valueString.Replace("OK+Get:", "") + "\r\n", Color.LimeGreen);
                 }
                 finishedCommand();
                 break;
@@ -1047,7 +1048,7 @@ class SerialPortsExtended: SerialPort
                 if (valueString.Contains("OK+CLEAR"))
                 {
                     valueString = valueString.Replace("OK+CONN", "");
-                    mainDisplay.Text += "Last Connected Device Cleared.\r\n";
+                    mainDisplay.AppendText("Last Connected Device Cleared.\r\n", Color.LimeGreen);
                 }
                 finishedCommand();
                 break;
@@ -1059,10 +1060,10 @@ class SerialPortsExtended: SerialPort
                     switch (switchString)
                     {
                         case "N":
-                            mainDisplay.Text += "No address provided\r\n";
+                            mainDisplay.AppendText("No address provided\r\n", Color.LimeGreen);
                             break;
                         case "L":
-                            mainDisplay.Text += "Connecting\r\n";
+                            mainDisplay.AppendText("Connecting\r\n", Color.LimeGreen);
                             break;
                         case "E":
                             mainDisplay.AppendText("Connection error\r\n", Color.Red);
@@ -1083,10 +1084,10 @@ class SerialPortsExtended: SerialPort
                     switch (switchString)
                     {
                         case "A":
-                            mainDisplay.Text += "Accept request, connecting...\r\n";
+                            mainDisplay.AppendText("Accept request, connecting...\r\n", Color.LimeGreen);
                             break;
                         case "":
-                            mainDisplay.Text += "Connected\r\n";
+                            mainDisplay.AppendText("Connected\r\n", Color.LimeGreen);
                             finishedCommand();
                             break;
                         case "E":
@@ -1113,13 +1114,13 @@ class SerialPortsExtended: SerialPort
                     {
                         // I probably need to come back and work on this bit.
                         // The actual register for PINs is 12-bits wide; I'm only listing 8 here.
-                        mainDisplay.Text += pinInfo[i];
-                        if(IsBitSet((byte)replyByte, i))
+                        mainDisplay.AppendText(pinInfo[i], Color.LimeGreen);
+                        if (IsBitSet((byte)replyByte, i))
                         {
-                            mainDisplay.Text += " HIGH\r\n";
+                            mainDisplay.AppendText(" HIGH\r\n", Color.LimeGreen);
                         } else
                         {
-                            mainDisplay.Text += " LOW\r\n";
+                            mainDisplay.AppendText(" LOW\r\n", Color.LimeGreen);
                         }
                     }
                 }
@@ -1129,11 +1130,11 @@ class SerialPortsExtended: SerialPort
                 isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
                 if (isSet)
                 {
-                    mainDisplay.Text += "Pin IO collection rate set to " + replySwitch + " seconds\r\n";
+                    mainDisplay.AppendText("Pin IO collection rate set to " + replySwitch + " seconds\r\n", Color.LimeGreen);
                 }
                 else
                 {
-                    mainDisplay.Text += "Pin IO collection is currently set to " + replySwitch + " seconds\r\n";
+                    mainDisplay.AppendText("Pin IO collection is currently set to " + replySwitch + " seconds\r\n", Color.LimeGreen);
                 }
 
                 break;
@@ -1149,10 +1150,10 @@ class SerialPortsExtended: SerialPort
                     switch (valueString)
                     {
                         case "S":
-                            mainDisplay.Text += "Device search STARTED...\r\n";
+                            mainDisplay.AppendText("Device search STARTED...\r\n", Color.LimeGreen);
                             break;
                         case "E":
-                            mainDisplay.Text += "Device search ENDED...\r\n";
+                            mainDisplay.AppendText("Device search ENDED...\r\n", Color.LimeGreen);
                             finishedCommand();
                             break;
                     }
@@ -1178,10 +1179,10 @@ class SerialPortsExtended: SerialPort
                     switch (switchString)
                     {
                         case "N":
-                            mainDisplay.Text += "No address provided\r\n";
+                            mainDisplay.AppendText("No address provided\r\n", Color.LimeGreen);
                             break;
                         case "L":
-                            mainDisplay.Text += "Connecting\r\n";
+                            mainDisplay.AppendText("Connecting\r\n", Color.LimeGreen);
                             break;
                         case "E":
                             mainDisplay.AppendText("Connection error\r\n", Color.Red);
@@ -1204,10 +1205,10 @@ class SerialPortsExtended: SerialPort
                     switch (switchString)
                     {
                         case "1":
-                            mainDisplay.Text += "Set to allow broadcast and scanning.\r\n";
+                            mainDisplay.AppendText("Set to allow broadcast and scanning.\r\n", Color.LimeGreen);
                             break;
                         case "2":
-                            mainDisplay.Text += "Set to only allow broadcast.\r\n";
+                            mainDisplay.AppendText("Set to only allow broadcast.\r\n", Color.LimeGreen);
                             break;
                     } 
                 } else
@@ -1217,7 +1218,7 @@ class SerialPortsExtended: SerialPort
                 break;
 
             case hm1xConstants.hm1xEnumCommands.RemoveBondInfo:
-                if (valueString.Contains("OK+ERASE")) { mainDisplay.Text += "Successfully erased bond info";  }
+                if (valueString.Contains("OK+ERASE")) { mainDisplay.AppendText("Successfully erased bond info", Color.LimeGreen);  }
                 else { errorFlag = true; }
                 break;
             case hm1xConstants.hm1xEnumCommands.AdvertizingFlag:
@@ -1234,10 +1235,10 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Flow control switch was set to OFF.\r\n";
+                            mainDisplay.AppendText("Flow control switch was set to OFF.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Flow control switch was set to ON.\r\n";
+                            mainDisplay.AppendText("Flow control switch was set to ON.\r\n", Color.LimeGreen);
                             break;
                     }
                 } else
@@ -1245,10 +1246,10 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Flow control switch is currently set to OFF.\r\n";
+                            mainDisplay.AppendText("Flow control switch is currently set to OFF.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Flow control switch is currently set to ON.\r\n";
+                            mainDisplay.AppendText("Flow control switch is currently set to ON.\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1261,10 +1262,10 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "RX Gain was set to OFF\r\n";
+                            mainDisplay.AppendText("RX Gain was set to OFF\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "RX Gain was set to ON\r\n";
+                            mainDisplay.AppendText("RX Gain was set to ON\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1273,16 +1274,16 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "RX Gain is currently set to OFF\r\n";
+                            mainDisplay.AppendText("RX Gain is currently set to OFF\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "RX Gain is currently set to ON\r\n";
+                            mainDisplay.AppendText("RX Gain is currently set to ON\r\n", Color.LimeGreen);
                             break;
                     }
                 }
                 break;
             case hm1xConstants.hm1xEnumCommands.Help:
-                if(valueString.Length > 0) { mainDisplay.Text += "Here is your 'help'--good luck with it, my friend: " + valueString; }
+                if(valueString.Length > 0) { mainDisplay.AppendText("Here is your 'help'--good luck with it, my friend: " + valueString, Color.LimeGreen); }
                 break;
             case hm1xConstants.hm1xEnumCommands.WorkType:
                 isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
@@ -1291,10 +1292,10 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Set Enter Serial Mode with Start Command\r\n";
+                            mainDisplay.AppendText("Set Enter Serial Mode with Start Command\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Set Enter Serial Mode Immediately\r\n";
+                            mainDisplay.AppendText("Set Enter Serial Mode Immediately\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1303,10 +1304,10 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Module is currently set to Enter Serial Mode with Start Command\r\n";
+                            mainDisplay.AppendText("Module is currently set to Enter Serial Mode with Start Command\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Module is currently set to Enter Serial Mode Immediately\r\n";
+                            mainDisplay.AppendText("Module is currently set to Enter Serial Mode Immediately\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1321,13 +1322,13 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Set Module to Transmission Mode.\r\n";
+                            mainDisplay.AppendText("Set Module to Transmission Mode.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Set PIO Collection and Transmission Mode.\r\n";
+                            mainDisplay.AppendText("Set PIO Collection and Transmission Mode.\r\n", Color.LimeGreen);
                             break;
                         case 2:
-                            mainDisplay.Text += "Set to Remote Control Mode.\r\n";
+                            mainDisplay.AppendText("Set to Remote Control Mode.\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1336,13 +1337,13 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Module is currently in Transmission Mode.\r\n";
+                            mainDisplay.AppendText("Module is currently in Transmission Mode.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Module is currently in PIO Collection and Transmission Mode.\r\n";
+                            mainDisplay.AppendText("Module is currently in PIO Collection and Transmission Mode.\r\n", Color.LimeGreen);
                             break;
                         case 2:
-                            mainDisplay.Text += "Module is currently in Remote Control Mode.\r\n";
+                            mainDisplay.AppendText("Module is currently in Remote Control Mode.\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1354,10 +1355,10 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Set to NOT notify when connection is established.\r\n";
+                            mainDisplay.AppendText("Set to NOT notify when connection is established.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Set notify when connection is established.\r\n";
+                            mainDisplay.AppendText("Set notify when connection is established.\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1366,10 +1367,10 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Module is currently set NOT to notify on connection.\r\n";
+                            mainDisplay.AppendText("Module is currently set NOT to notify on connection.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Module is currently set to notify on connection.\r\n";
+                            mainDisplay.AppendText("Module is currently set to notify on connection.\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1381,10 +1382,10 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Set to notify WITHOUT address when connection is established.\r\n";
+                            mainDisplay.AppendText("Set to notify WITHOUT address when connection is established.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Set to notify WITH address when connection is established.\r\n";
+                            mainDisplay.AppendText("Set to notify WITH address when connection is established.\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1393,18 +1394,18 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Module is currently set notify WITHOUT address when connection is established.\r\n";
+                            mainDisplay.AppendText("Module is currently set notify WITHOUT address when connection is established.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Module is currently set to notify WITH address when connection is established..\r\n";
+                            mainDisplay.AppendText("Module is currently set to notify WITH address when connection is established..\r\n", Color.LimeGreen);
                             break;
                     }
                 }
                 break;
             case hm1xConstants.hm1xEnumCommands.Name:
-                if (valueString.Contains("OK+NAME:")) { mainDisplay.Text += "Module's name: " + valueString.Replace("OK+NAME:", ""); }
-                if (valueString.Contains("OK+Set:")) { mainDisplay.Text += "Module's name was set to: " + valueString.Replace("OK+Set:", ""); }
-                mainDisplay.Text += "\r\n";
+                if (valueString.Contains("OK+NAME:")) { mainDisplay.AppendText("Module's name: " + valueString.Replace("OK+NAME:", ""), Color.LimeGreen); }
+                if (valueString.Contains("OK+Set:")) { mainDisplay.AppendText("Module's name was set to: " + valueString.Replace("OK+Set:", ""), Color.LimeGreen); }
+                mainDisplay.AppendText("\r\n", Color.LimeGreen);
                 break;
             case hm1xConstants.hm1xEnumCommands.OutputDriver:
                 isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
@@ -1413,10 +1414,10 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Set Output Power Driver to NORMAL.\r\n";
+                            mainDisplay.AppendText("Set Output Power Driver to NORMAL.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Set Output Power Driver to HIGH.\r\n";
+                            mainDisplay.AppendText("Set Output Power Driver to HIGH.\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1425,10 +1426,10 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Output Power Driver is currently set to NORMAL.\r\n";
+                            mainDisplay.AppendText("Output Power Driver is currently set to NORMAL.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Output Power Driver is currently set to HIGH.\r\n";
+                            mainDisplay.AppendText("Output Power Driver is currently set to HIGH.\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1440,13 +1441,13 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Set parity to NONE.\r\n";
+                            mainDisplay.AppendText("Set parity to NONE.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Set parity to EVEN.\r\n";
+                            mainDisplay.AppendText("Set parity to EVEN.\r\n", Color.LimeGreen);
                             break;
                         case 2:
-                            mainDisplay.Text += "Set parity to ODD.\r\n";
+                            mainDisplay.AppendText("Set parity to ODD.\r\n", Color.LimeGreen);
                             break;
                     }
                     mainDisplay.AppendText("Don't forget to change your serial connection settings! Oh my!", Color.Red);
@@ -1456,13 +1457,13 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Parity is currently set to NONE.\r\n";
+                            mainDisplay.AppendText("Parity is currently set to NONE.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Parity is currently set to EVEN.\r\n";
+                            mainDisplay.AppendText("Parity is currently set to EVEN.\r\n", Color.LimeGreen);
                             break;
                         case 2:
-                            mainDisplay.Text += "Parity is currently set to ODD.\r\n";
+                            mainDisplay.AppendText("Parity is currently set to ODD.\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1474,10 +1475,10 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Set LED to Blink 500ms when unconnected. High when connected.\r\n";
+                            mainDisplay.AppendText("Set LED to Blink 500ms when unconnected. High when connected.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Set LED to be LOW unconnected and HIGH when connected.\r\n";
+                            mainDisplay.AppendText("Set LED to be LOW unconnected and HIGH when connected.\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1486,10 +1487,10 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "LED currently will BLINK (500ms) when unconnected and is HIGH when connected.\r\n";
+                            mainDisplay.AppendText("LED currently will BLINK (500ms) when unconnected and is HIGH when connected.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "LED currently will be LOW unconnected and HIGH when connected.\r\n";
+                            mainDisplay.AppendText("LED currently will be LOW unconnected and HIGH when connected.\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1502,13 +1503,13 @@ class SerialPortsExtended: SerialPort
                 {
                     valueString = valueString.Replace("OK+PIO", "");
                     valueString = valueString.Replace(":", "");
-                    mainDisplay.Text += "Pin is " + valueString.Substring(0, 1);
-                    if(valueString.Substring(1, 1) == "0")
+                    mainDisplay.AppendText("Pin is " + valueString.Substring(0, 1), Color.LimeGreen);
+                    if (valueString.Substring(1, 1) == "0")
                     {
-                        mainDisplay.Text += " LOW\r\n";
+                        mainDisplay.AppendText(" LOW\r\n", Color.LimeGreen);
                     } else
                     {
-                        mainDisplay.Text += " HIGH\r\n";
+                        mainDisplay.AppendText(" HIGH\r\n", Color.LimeGreen);
                     }
                 }            
 
@@ -1516,12 +1517,12 @@ class SerialPortsExtended: SerialPort
             case hm1xConstants.hm1xEnumCommands.Pin:
                 if (valueString.Contains("OK+Get:"))
                 {
-                    mainDisplay.Text += "Current bonding PIN (aka, password): ";
+                    mainDisplay.AppendText("Current bonding PIN (aka, password): ", Color.LimeGreen);
                     mainDisplay.AppendText(valueString.Replace("OK+Get:", ""), Color.White);
                 }
                 else if (valueString.Contains("OK+Set:"))
                 {
-                    mainDisplay.Text += "Bonding PIN set to: ";
+                    mainDisplay.AppendText("Bonding PIN set to: ", Color.LimeGreen);
                     mainDisplay.AppendText(valueString.Replace("OK+Set:", ""), Color.White);
                 }
                 break;
@@ -1532,16 +1533,16 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Set transmission power to -23dmb.\r\n";
+                            mainDisplay.AppendText("Set transmission power to -23dmb.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Set transmission power to -6dmb.\r\n";
+                            mainDisplay.AppendText("Set transmission power to -6dmb.\r\n", Color.LimeGreen);
                             break;
                         case 2:
-                            mainDisplay.Text += "Set transmission power to 0dmb.\r\n";
+                            mainDisplay.AppendText("Set transmission power to 0dmb.\r\n", Color.LimeGreen);
                             break;
                         case 3:
-                            mainDisplay.Text += "Set transmission power to 6dmb.\r\n";
+                            mainDisplay.AppendText("Set transmission power to 6dmb.\r\n", Color.LimeGreen);
                             break;
                     }
                 }
@@ -1550,20 +1551,223 @@ class SerialPortsExtended: SerialPort
                     switch (replySwitch)
                     {
                         case 0:
-                            mainDisplay.Text += "Current transmission power is -23dmb.\r\n";
+                            mainDisplay.AppendText("Current transmission power is -23dmb.\r\n", Color.LimeGreen);
                             break;
                         case 1:
-                            mainDisplay.Text += "Current transmission power is -6dmb.\r\n";
+                            mainDisplay.AppendText("Current transmission power is -6dmb.\r\n", Color.LimeGreen);
                             break;
                         case 2:
-                            mainDisplay.Text += "Current transmission power is 0dmb.\r\n";
+                            mainDisplay.AppendText("Current transmission power is 0dmb.\r\n", Color.LimeGreen);
                             break;
                         case 3:
-                            mainDisplay.Text += "Current transmission power is 6dmb.\r\n";
+                            mainDisplay.AppendText("Current transmission power is 6dmb.\r\n", Color.LimeGreen);
                             break;
                     }
                 }
                 break;
+            case hm1xConstants.hm1xEnumCommands.SleepType:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Set to Auto-Sleep.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Set NOT to Auto-Sleep.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Current sleep type is Auto-Sleep.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Current sleep type is NOT Auto-Sleep.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.ReliableAdvertizing:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Set to Normal Advertizing.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Set Reliable Advertizing.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Current advertizing reliability is Normal.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Currently set to Reliable Advertizing.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.Renew:
+                if (valueString.Contains("OK+RENEW")) { mainDisplay.AppendText("Successfully Reset to Factory Settings. AHH! Fresh as a summer breeze!\r\n", Color.Red); }
+                break;
+            case hm1xConstants.hm1xEnumCommands.Reset:
+                if (valueString.Contains("OK+RESET")) { mainDisplay.AppendText("Successfully Reset.\r\n \"Have you tried turning it off'n'on again?\"", Color.Red); }
+                break;
+            case hm1xConstants.hm1xEnumCommands.Role:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Set to Peripheral Role.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Set to Central Role.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Currently acting as Peripheral.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Currently acting as Central.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.RSSI:
+                if (valueString.Contains("OK+RSSI:"))
+                {
+                    mainDisplay.AppendText("Current Radio Signal Strength Indicator is: " + valueString.Replace("OK+RSSI:", ""), Color.LimeGreen);
+                } else
+                {
+                    mainDisplay.AppendText("No response.  Are you connected to a remote module?", Color.LimeGreen);
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.SensorWorkInterval:
+
+                //////////////// NEED TO REVISIT WITH SENSOR //////////////
+
+                break;
+            case hm1xConstants.hm1xEnumCommands.StopBits:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Set to One Stop Bit.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Set to Two Stop Bits.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Currently set to One Stop Bit.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Currently set to Two Stop Bits.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.StartWork:
+
+                if (valueString.Contains("OK+START")) { mainDisplay.AppendText("Entered Work Mode", Color.LimeGreen); }
+                break;
+
+            case hm1xConstants.hm1xEnumCommands.Sleep:
+                if (valueString.Contains("OK+SLEEP")) { mainDisplay.AppendText("Module went to sleep. Send > 80 characters to wake.\r\n", Color.LimeGreen); }
+                break;
+            case hm1xConstants.hm1xEnumCommands.SaveConnectedAddress:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Set to save address on connection.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Set NOT to save address on connection.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Currently set to save address on connection.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Currently set to NOT save address on connection.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.TemperatureSensor:
+
+                ////////////// NOT IMPLEMENTED ///////////////////
+
+                break;
+            case hm1xConstants.hm1xEnumCommands.DiscoveryParameter:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Set to NOT show names during search.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Set to show names during search.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Currently set to NOT show names during search.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Currently set to show names during search.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.ICTemperature:
+                if(valueString.Contains("OK+Get:")){
+                    string conversionString = valueString.Replace("OK+Get:", "");
+                    float celsius = float.Parse(conversionString, CultureInfo.InvariantCulture.NumberFormat);
+                    float fahrenheit = (celsius * (float)1.8) + 32;
+                    mainDisplay.AppendText("Fahrenheit: " + fahrenheit + "\r\n" + "Celsius: " + celsius + "\r\n");
+
+                }
                 break;
             case hm1xConstants.hm1xEnumCommands.ERROR:
                 errorFlag = true;
@@ -1753,8 +1957,6 @@ class SerialPortsExtended: SerialPort
         comboBox.SelectedIndex = defaultIndex;
     }
 
-
-
     public void addHM1XSettingsToComboBox(ComboBox settingsComboBox, hm1xConstants.hm1xEnumCommands commandValue, TextBox parameterOne, 
         TextBox parameterTwo, Label parameterOneLbl, Label parameterTwoLbl, TextBox sysLogTextBox, Button confirmButton)
     {
@@ -1778,16 +1980,20 @@ class SerialPortsExtended: SerialPort
         atCommandSuffixList.Clear();
     }
 
+    public hm1xConstants.hm1xDeviceType getDeviceType()
+    {
+        return hm1xModuleType;
+    }
 
     public void commandSelectedMessage(RichTextBox richTextBox, hm1xConstants.hm1xEnumCommands selectedEnumeration)
     {
         switch (selectedEnumeration)
         {
             case hm1xConstants.hm1xEnumCommands.TryLastConnected:
-                richTextBox.Text += "This option only works if module is set to Central (ROLE0) and the Work Mode set to only connect when told (IMME1).\r\nThis command take will take 10 seconds for a response.\r\n";
+                richTextBox.AppendText("This option only works if module is set to Central (ROLE0) and the Work Mode set to only connect when told (IMME1).\r\nThis command take will take 10 seconds for a response.\r\n", Color.LimeGreen);
                 break;
             case hm1xConstants.hm1xEnumCommands.TryConnectionAddress:
-                richTextBox.Text += "This option only works if module is set to Central (ROLE0) and the Work Mode set to only connect when told (IMME1).\r\nThis command take will take 10 seconds for a response.\r\nMay receive a reply:\r\n\t\tOK + CONNA ========= Accept request, connection \r\n \t\tOK + CONNE ========= Connect error \r\n \t\tOK + CONN   ========= Connected, if AT + NOTI1 is setup \r\n \t\tOK + CONNF ========= Connect Failed, After 10 seconds\r\n";
+                richTextBox.AppendText("This option only works if module is set to Central (ROLE0) and the Work Mode set to only connect when told (IMME1).\r\nThis command take will take 10 seconds for a response.\r\nMay receive a reply:\r\n\t\tOK + CONNA ========= Accept request, connection \r\n \t\tOK + CONNE ========= Connect error \r\n \t\tOK + CONN   ========= Connected, if AT + NOTI1 is setup \r\n \t\tOK + CONNF ========= Connect Failed, After 10 seconds\r\n", Color.LimeGreen);
                 break;
             case hm1xConstants.hm1xEnumCommands.StartDiscovery:
                 richTextBox.AppendText("For firmware versions less than v539 only six devices can be discovered at a time.  After v539, it is unlimited.\r\n", Color.Red);
@@ -1803,6 +2009,15 @@ class SerialPortsExtended: SerialPort
                 break;
             case hm1xConstants.hm1xEnumCommands.PIOState:
                 richTextBox.AppendText("NOTE: I programmed this bit using V540 and it doesn't seem to recognize pins 5-B.  Maybe they got the HM-10 and HM-11 settings confused?\r\nHowever, setting the pins with the byte feature still seems to work correctly.\r\n", Color.Red);
+                break;
+            case hm1xConstants.hm1xEnumCommands.Renew:
+                richTextBox.AppendText("WARNING! This action will reset the module to factory default.  The UART setting will be 9600/8/1/N", Color.Red);
+                break;
+            case hm1xConstants.hm1xEnumCommands.RSSI:
+                richTextBox.AppendText("You must be connected and in Transmission and PIO collection mode or Transmission and Remote Control Mode for a response.\r\n");
+                break;
+            case hm1xConstants.hm1xEnumCommands.StartWork:
+                richTextBox.AppendText("For this to work you must set Work Type to \"Enter Serial Mode with Start Command\" first.\r\n ");
                 break;
 
         }
