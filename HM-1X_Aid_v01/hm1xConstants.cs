@@ -104,7 +104,7 @@ namespace HM_1X_Aid_v01
             "Discovery Parameter",
             "Temperature Sensor",
             "IC Temperature",
-            "Remove Device Timeout",
+            "Connect Device Timeout",
             "Bond Type",
             "Service",
             "Wake Through UART",
@@ -856,9 +856,49 @@ namespace HM_1X_Aid_v01
                     settingsExplained.SelectedIndex = 0;
                     break;
                 //"AT+TCON
+                case hm1xConstants.hm1xEnumCommands.RemoteDeviceTimeout:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get timeout for connecting (milliseconds)");
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Set timeout for connecting (milliseconds)");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+TYPE
+                case hm1xConstants.hm1xEnumCommands.BondType:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get PIN at Connection Setting");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("No PIN Needed");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Authorize, but no PIN");
+                    atCommandList.Add("2");
+                    settingsExplained.Items.Add("Authorize with PIN");
+                    atCommandList.Add("3");
+                    settingsExplained.Items.Add("Authorize and bond");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+UUID
+                case hm1xConstants.hm1xEnumCommands.Service:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Service UUID");
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Set Service UUID");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+UART
+                case hm1xConstants.hm1xEnumCommands.WakeThroughUART:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Wake-through-UART Setting");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set Wake-through-UART ON");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set Wake-through-UART OFF");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+VERS"
                 case hm1xConstants.hm1xEnumCommands.Version:
                     atCommandList.Add("?");
@@ -1135,6 +1175,69 @@ namespace HM_1X_Aid_v01
                         parameterOne.Text = new string(pinCharArray);
                     }
                     break;
+                case hm1xConstants.hm1xEnumCommands.RemoteDeviceTimeout:
+                    if (settingsSelection > 0)
+                    {
+                        parameterOne.Text = parameterOne.Text.ToUpper();
+                        // If there are less than four chars, pad with '0';
+                        int deviceTimeoutCharCount = parameterOne.Text.Count();
+                        Console.WriteLine(deviceTimeoutCharCount);
+                        if (deviceTimeoutCharCount < 6)
+                        {
+                            for (int i = 0; i < (6 - deviceTimeoutCharCount); i++)
+                            {
+                                parameterOne.Text += "0";
+                            }
+                        }
+                        else if (deviceTimeoutCharCount > 6)  // If there are more than four characters, trim it.
+                        {
+                            parameterOne.Text = parameterOne.Text.Remove(6, deviceTimeoutCharCount - 6);
+                        }
+
+                        // Make sure all four characters are in HEX range.
+                        char[] deviceTimeoutCharArray = parameterOne.Text.ToCharArray();
+                        for (int i = 0; i < 6; i++)
+                        {
+                            if (deviceTimeoutCharArray[i] > '9') { deviceTimeoutCharArray[i] = '9'; }
+                            else if (deviceTimeoutCharArray[i] < '0') { deviceTimeoutCharArray[i] = '0'; }
+                        }
+                        parameterOne.Text = new string(deviceTimeoutCharArray);
+                    }
+                    break;
+                case hm1xConstants.hm1xEnumCommands.Service:
+                    if (settingsSelection > 0)
+                    {
+                        parameterOne.Text = parameterOne.Text.ToUpper();
+                        // If there are less than four chars, pad with '0';
+                        int serviceCharCount = parameterOne.Text.Count();
+                        if (serviceCharCount < 4)
+                        {
+                            for (int i = 0; i < (4 - serviceCharCount); i++)
+                            {
+                                parameterOne.Text += "0";
+                            }
+                        }
+                        else if (serviceCharCount > 4)  // If there are more than four characters, trim it.
+                        {
+                            parameterOne.Text = parameterOne.Text.Remove(4, serviceCharCount - 4);
+                        }
+
+                        // Make sure all four characters are in HEX range.
+                        char[] hexCheckCharArray = parameterOne.Text.ToCharArray();
+                        for (int i = 0; i < 4; i++)
+                        {
+                            if (hexCheckCharArray[i] > 'F') { hexCheckCharArray[i] = 'F'; }
+                            else if (hexCheckCharArray[i] < '0') { hexCheckCharArray[i] = '0'; }
+                        }
+
+                        // Make sure the first and last characters are valid.
+                        if (hexCheckCharArray[3] > 'E') { hexCheckCharArray[3] = 'E'; }
+                        if (hexCheckCharArray[3] < '1') { hexCheckCharArray[3] = '1'; }
+                        parameterOne.Text = "0x" + new string(hexCheckCharArray);
+
+                    }
+                    break;
+                
             }
         }
 

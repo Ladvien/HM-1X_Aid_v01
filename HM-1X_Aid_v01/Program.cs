@@ -1769,6 +1769,87 @@ class SerialPortsExtended: SerialPort
 
                 }
                 break;
+            case hm1xConstants.hm1xEnumCommands.RemoteDeviceTimeout:
+                if (valueString.Contains("OK+Get:"))
+                {
+                    mainDisplay.AppendText("Connection attempt timeout is currently set to " + valueString.Replace("OK+Get:", "") + " in millseconds.\r\n");
+                } else if (valueString.Contains("OK+Set:"))
+                {
+                    mainDisplay.AppendText("Connection attempt timeout set to " + valueString.Replace("OK+Set:", "") + " in millseconds.\r\n");
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.BondType:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Set to No PIN needed to connect.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Set to authorize WITHOUT PIN.\r\n", Color.LimeGreen);
+                            break;
+                        case 2:
+                            mainDisplay.AppendText("Set to authorize WITH PIN.\r\n", Color.LimeGreen);
+                            break;
+                        case 3:
+                            mainDisplay.AppendText("Set to authorize and bond.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Currently set to require no PIN to connect.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Currently set to authorize WITHOUT PIN.\r\n", Color.LimeGreen);
+                            break;
+                        case 2:
+                            mainDisplay.AppendText("Currently set to authorize WITH PIN.\r\n", Color.LimeGreen);
+                            break;
+                        case 3:
+                            mainDisplay.AppendText("Currently set to authorize and bond.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.Service:
+
+                if (valueString.Contains("OK+Get:")) { mainDisplay.AppendText("Current Service UUID: " + valueString.Replace("OK+Get:", "") + "\r\n", Color.LimeGreen); }
+                else if (valueString.Contains("OK+Set:")) { mainDisplay.AppendText("Set Service UUID to: " + valueString.Replace("OK+Set:", "") + "\r\n", Color.LimeGreen); }
+
+                break;
+            case hm1xConstants.hm1xEnumCommands.WakeThroughUART:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Set the device to be wakened by UART.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Set the device NOT to be wakened by UART.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.AppendText("Currently set to wake by UART.\r\n", Color.LimeGreen);
+                            break;
+                        case 1:
+                            mainDisplay.AppendText("Currently set to NOT wake by UART.\r\n", Color.LimeGreen);
+                            break;
+                    }
+                }
+                break;
             case hm1xConstants.hm1xEnumCommands.ERROR:
                 errorFlag = true;
                 break;
@@ -2019,7 +2100,12 @@ class SerialPortsExtended: SerialPort
             case hm1xConstants.hm1xEnumCommands.StartWork:
                 richTextBox.AppendText("For this to work you must set Work Type to \"Enter Serial Mode with Start Command\" first.\r\n ");
                 break;
-
+            case hm1xConstants.hm1xEnumCommands.BondType:
+                richTextBox.AppendText("This option should be used if firmware is less than v524.\r\n");
+                break;
+            case hm1xConstants.hm1xEnumCommands.WakeThroughUART:
+                richTextBox.AppendText("This option is on available to HMSensor.\r\n");
+                break;
         }
         richTextBox.SelectionStart = richTextBox.Text.Length;
         richTextBox.ScrollToCaret();

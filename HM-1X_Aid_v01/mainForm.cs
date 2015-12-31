@@ -666,6 +666,24 @@ namespace HM_1X_Aid_v01
                         txbParameterOne.Visible = true;
                     }
                     break;
+                case hm1xConstants.hm1xEnumCommands.RemoteDeviceTimeout:
+                    if (cmbHM1XSettings.SelectedIndex > 0)
+                    {
+                        lblParameterOne.Text = "000000-999999ms";
+                        lblParameterOne.Visible = true;
+                        txbParameterOne.Visible = true;
+                    }
+                    break;
+                case hm1xConstants.hm1xEnumCommands.Service:
+                    if (cmbHM1XSettings.SelectedIndex > 0)
+                    {
+                        txbParameterOne.Visible = true;
+                        lblParameterOne.Text = "Char as HEX (4)";
+                        lblParameterOne.Visible = true;
+                        // Default the response timeout.
+                        serialPorts.setResponseTimeout(250);
+                    }
+                    break;
             }
         }
     }
