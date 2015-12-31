@@ -475,15 +475,41 @@ namespace HM_1X_Aid_v01
                     atCommandList.Add("?");
                     settingsExplained.Items.Add("Get flow control setting");
                     atCommandList.Add("0");
-                    settingsExplained.Items.Add("Get flow control ON");
+                    settingsExplained.Items.Add("Set flow control ON");
                     atCommandList.Add("1");
-                    settingsExplained.Items.Add("Get flow control OFF");
+                    settingsExplained.Items.Add("Set flow control OFF");
                     settingsExplained.Enabled = true;
                     settingsExplained.SelectedIndex = 0;
                     break;
                 //"AT+GAIN",
+                case hm1xConstants.hm1xEnumCommands.RXGain:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get RX Gain setting");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set RX Gain ON");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set RX Gain OFF");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+HELP
+                case hm1xConstants.hm1xEnumCommands.Help:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get JNHuamao Website");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+IMME
+                case hm1xConstants.hm1xEnumCommands.WorkType:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Work Type");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set Enter Serial Mode with Start Command");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set Enter Serial Mode Immediately");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+IBEA
                 //"AT+BEA0
                 //"AT+BEA1
@@ -493,9 +519,49 @@ namespace HM_1X_Aid_v01
                 //"AT+MINO
                 //"AT+MEAS
                 //"AT+MODE
+                case hm1xConstants.hm1xEnumCommands.WorkMode:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Transmission Mode");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set Module to Transmission Mode");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set PIO Collection and Transmission Mode");
+                    atCommandList.Add("2");
+                    settingsExplained.Items.Add("Set to Remote Control Mode");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+NOTI
+                case hm1xConstants.hm1xEnumCommands.ConnectionNotification:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Notification on Connection Mode");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set to NOT notifty on connection");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set to notifty on connection");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+NOTP
+                case hm1xConstants.hm1xEnumCommands.ConnNotificationMode:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Notify with Address Setting.");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set to Notify without Address");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set With Addresss");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+NAME
+                case hm1xConstants.hm1xEnumCommands.Name:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Name of Module");
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Set Name of Module");;
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+PCTL
                 //"AT+PARI
                 //"AT+PIO
@@ -757,6 +823,21 @@ namespace HM_1X_Aid_v01
                     }
 
                     parameterOne.Text = new string(advFlagCheckCharArray);
+                    break;
+                case hm1xConstants.hm1xEnumCommands.Name:
+                    if(settingsSelection > 0)
+                    {
+                        int nameLength = parameterOne.Text.Length;
+                        if(nameLength > 12)
+                        {
+                            parameterOne.Text = parameterOne.Text.Remove(12, nameLength - 12);
+                            Console.WriteLine(parameterOne.Text);
+                        } else if (nameLength < 1)
+                        {
+                            parameterOne.Text = "ALABTU >:)";
+                        }
+                    }
+
                     break;
             }
         }

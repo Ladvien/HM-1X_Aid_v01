@@ -640,6 +640,13 @@ namespace HM_1X_Aid_v01
                     lblParameterOne.Visible = true;
                     txbParameterOne.Visible = true;
                     break;
+                case hm1xConstants.hm1xEnumCommands.Name:
+                    if(cmbHM1XSettings.SelectedIndex > 0) {
+                        lblParameterOne.Text = "Name (Max 12 chars)";
+                        lblParameterOne.Visible = true;
+                        txbParameterOne.Visible = true;
+                    }
+                    break;
 
             }
         }

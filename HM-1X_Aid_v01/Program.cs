@@ -1228,8 +1228,182 @@ class SerialPortsExtended: SerialPort
             case hm1xConstants.hm1xEnumCommands.FlowControlSwitch:
 
                 //////////////// WILL NEED TO TEST AFTER UPGRADE ///////////////////////
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Flow control switch was set to OFF.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Flow control switch was set to ON.\r\n";
+                            break;
+                    }
+                } else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Flow control switch is currently set to OFF.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Flow control switch is currently set to ON.\r\n";
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.RXGain:
+                //////////////// WILL NEED TO TEST AFTER UPGRADE ///////////////////////
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "RX Gain was set to OFF\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "RX Gain was set to ON\r\n";
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "RX Gain is currently set to OFF\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "RX Gain is currently set to ON\r\n";
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.Help:
+                if(valueString.Length > 0) { mainDisplay.Text += "Here is your 'help'--good luck with it, my friend: " + valueString; }
+                break;
+            case hm1xConstants.hm1xEnumCommands.WorkType:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Set Enter Serial Mode with Start Command\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Set Enter Serial Mode Immediately\r\n";
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Module is currently set to Enter Serial Mode with Start Command\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Module is currently set to Enter Serial Mode Immediately\r\n";
+                            break;
+                    }
+                }
+                break;
+            
+            /////////////////// IBEACON CRAP!!///////////////////
 
-
+            case hm1xConstants.hm1xEnumCommands.WorkMode:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Set Module to Transmission Mode.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Set PIO Collection and Transmission Mode.\r\n";
+                            break;
+                        case 2:
+                            mainDisplay.Text += "Set to Remote Control Mode.\r\n";
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Module is currently in Transmission Mode.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Module is currently in PIO Collection and Transmission Mode.\r\n";
+                            break;
+                        case 2:
+                            mainDisplay.Text += "Module is currently in Remote Control Mode.\r\n";
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.ConnectionNotification:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Set to NOT notify when connection is established.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Set notify when connection is established.\r\n";
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Module is currently set NOT to notify on connection.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Module is currently set to notify on connection.\r\n";
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.ConnNotificationMode:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Set to notify WITHOUT address when connection is established.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Set to notify WITH address when connection is established.\r\n";
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Module is currently set notify WITHOUT address when connection is established.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Module is currently set to notify WITH address when connection is established..\r\n";
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.Name:
+                if (valueString.Contains("OK+NAME:")) { mainDisplay.Text += "Module's name: " + valueString.Replace("OK+NAME:", ""); }
+                if (valueString.Contains("OK+Set:")) { mainDisplay.Text += "Module's name was set to: " + valueString.Replace("OK+Set:", ""); }
                 break;
             case hm1xConstants.hm1xEnumCommands.ERROR:
                 errorFlag = true;
@@ -1463,6 +1637,9 @@ class SerialPortsExtended: SerialPort
                 break;
             case hm1xConstants.hm1xEnumCommands.iBeaconMode:
                 richTextBox.AppendText("After execution, module will reset after 500ms\r\n", Color.Red);
+                break;
+            case hm1xConstants.hm1xEnumCommands.WorkType:
+                richTextBox.AppendText("When this setting is on the module will only respond to AT Commands.\r\nThe module must receive \"AT+START\" before it will enter serial transmission mode.\r\n", Color.Red);
                 break;
                  
         }
