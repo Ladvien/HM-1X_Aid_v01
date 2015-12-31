@@ -15,7 +15,7 @@ namespace HM_1X_Aid_v01
                                    "AT+BIT7","AT+BAUD","AT+COMI","AT+COMA","AT+COLA","AT+COUP","AT+CHAR", "AT+CLEAR","AT+CONNL","AT+CO","AT+COL",
                                    "AT+CYC", "AT+DISC", "AT+DISI", "AT+CONN", "AT+DELO", "AT+ERASE", "AT+FLAG", "AT+FILT", "AT+FIOW", "AT+GAIN",
                                    "AT+HELP", "AT+IMME", "AT+IBEA", "AT+BEA0", "AT+BEA1", "AT+BEA2", "AT+BEA3", "AT+MARJ", "AT+MINO", "AT+MEAS",
-                                   "AT+MODE", "AT+NOTI", "AT+NOTP", "AT+NAME", "AT+PCTL", "AT+PARI", "AT+PIO", "AT+PASS", "AT+PIN", "AT+POWE",
+                                   "AT+MODE", "AT+NOTI", "AT+NOTP", "AT+NAME", "AT+PCTL", "AT+PARI", "AT+PIO1", "AT+PASS", "AT+PIN", "AT+POWE",
                                    "AT+PWRM", "AT+RELI", "AT+RENEW", "AT+RESTART", "AT+ROLE", "AT+RSSI", "AT+RADD", "AT+RAT", "AT+STOP", "AT+START",
                                    "AT+SLEEP", "AT+SAVE", "AT+SENS", "AT+SHOW", "AT+TEHU", "AT+TEMP", "AT+TCON", "AT+TYPE", "AT+UUID", "AT+UART","AT+VERS", "ERROR"};
 
@@ -563,8 +563,40 @@ namespace HM_1X_Aid_v01
                     settingsExplained.SelectedIndex = 0;
                     break;
                 //"AT+PCTL
+                case hm1xConstants.hm1xEnumCommands.OutputDriver:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Output Power Driver Setting");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set Output Power Driver NORMAL");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set Output Power Driver HIGH");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+PARI
+                case hm1xConstants.hm1xEnumCommands.Parity:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Current Parity setting");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set Parity to None");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set Parity to EVEN");
+                    atCommandList.Add("2");
+                    settingsExplained.Items.Add("Set Parity to ODD");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+PIO
+                case hm1xConstants.hm1xEnumCommands.ConnectionLEDMode:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get LED Connection Behavior");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Unconnected - Blink 500ms");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Unconnected - Low, Connected - High");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+PASS
                 //"AT+PIN
                 //"AT+POWE
@@ -582,6 +614,7 @@ namespace HM_1X_Aid_v01
                     settingsExplained.SelectedIndex = 0;
                     break;
                 //"AT+RAT
+
                 //"AT+STOP
                 //"AT+START
                 //"AT+SLEEP
@@ -837,8 +870,8 @@ namespace HM_1X_Aid_v01
                             parameterOne.Text = "ALABTU >:)";
                         }
                     }
-
                     break;
+
             }
         }
 

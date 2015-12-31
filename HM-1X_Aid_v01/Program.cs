@@ -1405,6 +1405,94 @@ class SerialPortsExtended: SerialPort
                 if (valueString.Contains("OK+NAME:")) { mainDisplay.Text += "Module's name: " + valueString.Replace("OK+NAME:", ""); }
                 if (valueString.Contains("OK+Set:")) { mainDisplay.Text += "Module's name was set to: " + valueString.Replace("OK+Set:", ""); }
                 break;
+            case hm1xConstants.hm1xEnumCommands.OutputDriver:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Set Output Power Driver to NORMAL.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Set Output Power Driver to HIGH.\r\n";
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Output Power Driver is currently set to NORMAL.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Output Power Driver is currently set to HIGH.\r\n";
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.Parity:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Set parity to NONE.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Set parity to EVEN.\r\n";
+                            break;
+                        case 2:
+                            mainDisplay.Text += "Set parity to ODD.\r\n";
+                            break;
+                    }
+                    mainDisplay.AppendText("Don't forget to change your serial connection settings! Oh my!", Color.Red);
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Parity is currently set to NONE.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Parity is currently set to EVEN.\r\n";
+                            break;
+                        case 2:
+                            mainDisplay.Text += "Parity is currently set to ODD.\r\n";
+                            break;
+                    }
+                }
+                break;
+            case hm1xConstants.hm1xEnumCommands.ConnectionLEDMode:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Set LED to Blink 500ms when unconnected. High when connected.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Set LED to be LOW unconnected and HIGH when connected.\r\n";
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "LED currently will BLINK (500ms) when unconnected and is HIGH when connected.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "LED currently will be LOW unconnected and HIGH when connected.\r\n";
+                            break;
+                    }
+                }
+                break;
             case hm1xConstants.hm1xEnumCommands.ERROR:
                 errorFlag = true;
                 break;
