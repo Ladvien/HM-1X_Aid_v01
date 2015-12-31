@@ -1525,7 +1525,46 @@ class SerialPortsExtended: SerialPort
                     mainDisplay.AppendText(valueString.Replace("OK+Set:", ""), Color.White);
                 }
                 break;
-
+            case hm1xConstants.hm1xEnumCommands.PowerLevel:
+                isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
+                if (isSet)
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Set transmission power to -23dmb.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Set transmission power to -6dmb.\r\n";
+                            break;
+                        case 2:
+                            mainDisplay.Text += "Set transmission power to 0dmb.\r\n";
+                            break;
+                        case 3:
+                            mainDisplay.Text += "Set transmission power to 6dmb.\r\n";
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (replySwitch)
+                    {
+                        case 0:
+                            mainDisplay.Text += "Current transmission power is -23dmb.\r\n";
+                            break;
+                        case 1:
+                            mainDisplay.Text += "Current transmission power is -6dmb.\r\n";
+                            break;
+                        case 2:
+                            mainDisplay.Text += "Current transmission power is 0dmb.\r\n";
+                            break;
+                        case 3:
+                            mainDisplay.Text += "Current transmission power is 6dmb.\r\n";
+                            break;
+                    }
+                }
+                break;
+                break;
             case hm1xConstants.hm1xEnumCommands.ERROR:
                 errorFlag = true;
                 break;

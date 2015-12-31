@@ -697,6 +697,20 @@ namespace HM_1X_Aid_v01
                     settingsExplained.SelectedIndex = 0;
                     break;
                 //"AT+POWE
+                case hm1xConstants.hm1xEnumCommands.PowerLevel:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get current transmission power");
+                    atCommandList.Add("0");
+                    settingsExplained.Items.Add("Set transmission power to -23dmb");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set transmission power to -6dmb");
+                    atCommandList.Add("2");
+                    settingsExplained.Items.Add("Set transmission power to 0dmb");
+                    atCommandList.Add("3");
+                    settingsExplained.Items.Add("Set transmission power to 6dmb");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+PWRM
                 //"AT+RELI
                 //"AT+RENEW
