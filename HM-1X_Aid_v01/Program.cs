@@ -1101,7 +1101,7 @@ class SerialPortsExtended: SerialPort
                     }
                 }
                 break;
-            case hm1xConstants.hm1xEnumCommands.PIOState:
+            case hm1xConstants.hm1xEnumCommands.PIOStateByte:
                 if (valueString.Contains("OK+Col:"))
                 {
                     valueString = valueString.Replace("OK+Col:", "");
@@ -1404,6 +1404,7 @@ class SerialPortsExtended: SerialPort
             case hm1xConstants.hm1xEnumCommands.Name:
                 if (valueString.Contains("OK+NAME:")) { mainDisplay.Text += "Module's name: " + valueString.Replace("OK+NAME:", ""); }
                 if (valueString.Contains("OK+Set:")) { mainDisplay.Text += "Module's name was set to: " + valueString.Replace("OK+Set:", ""); }
+                mainDisplay.Text += "\r\n";
                 break;
             case hm1xConstants.hm1xEnumCommands.OutputDriver:
                 isItGetOrSet(valueString, out getOrSet, out replySwitch, out isSet);
@@ -1493,6 +1494,38 @@ class SerialPortsExtended: SerialPort
                     }
                 }
                 break;
+            case hm1xConstants.hm1xEnumCommands.PIOState:
+                //////////////////////////////////////////////////////////////////////////////////////////
+                ////////////// Come back here and add PWM ////////////////////////////////////////////////
+                //////////////////////////////////////////////////////////////////////////////////////////
+                if (valueString.Contains("OK+PIO"))
+                {
+                    valueString = valueString.Replace("OK+PIO", "");
+                    valueString = valueString.Replace(":", "");
+                    mainDisplay.Text += "Pin is " + valueString.Substring(0, 1);
+                    if(valueString.Substring(1, 1) == "0")
+                    {
+                        mainDisplay.Text += " LOW\r\n";
+                    } else
+                    {
+                        mainDisplay.Text += " HIGH\r\n";
+                    }
+                }            
+
+                break;
+            case hm1xConstants.hm1xEnumCommands.Pin:
+                if (valueString.Contains("OK+Get:"))
+                {
+                    mainDisplay.Text += "Current bonding PIN (aka, password): ";
+                    mainDisplay.AppendText(valueString.Replace("OK+Get:", ""), Color.White);
+                }
+                else if (valueString.Contains("OK+Set:"))
+                {
+                    mainDisplay.Text += "Bonding PIN set to: ";
+                    mainDisplay.AppendText(valueString.Replace("OK+Set:", ""), Color.White);
+                }
+                break;
+
             case hm1xConstants.hm1xEnumCommands.ERROR:
                 errorFlag = true;
                 break;
@@ -1729,7 +1762,10 @@ class SerialPortsExtended: SerialPort
             case hm1xConstants.hm1xEnumCommands.WorkType:
                 richTextBox.AppendText("When this setting is on the module will only respond to AT Commands.\r\nThe module must receive \"AT+START\" before it will enter serial transmission mode.\r\n", Color.Red);
                 break;
-                 
+            case hm1xConstants.hm1xEnumCommands.PIOState:
+                richTextBox.AppendText("NOTE: I programmed this bit using V540 and it doesn't seem to recognize pins 5-B.  Maybe they got the HM-10 and HM-11 settings confused?\r\nHowever, setting the pins with the byte feature still seems to work correctly.\r\n", Color.Red);
+                break;
+
         }
         richTextBox.SelectionStart = richTextBox.Text.Length;
         richTextBox.ScrollToCaret();

@@ -15,7 +15,7 @@ namespace HM_1X_Aid_v01
                                    "AT+BIT7","AT+BAUD","AT+COMI","AT+COMA","AT+COLA","AT+COUP","AT+CHAR", "AT+CLEAR","AT+CONNL","AT+CO","AT+COL",
                                    "AT+CYC", "AT+DISC", "AT+DISI", "AT+CONN", "AT+DELO", "AT+ERASE", "AT+FLAG", "AT+FILT", "AT+FIOW", "AT+GAIN",
                                    "AT+HELP", "AT+IMME", "AT+IBEA", "AT+BEA0", "AT+BEA1", "AT+BEA2", "AT+BEA3", "AT+MARJ", "AT+MINO", "AT+MEAS",
-                                   "AT+MODE", "AT+NOTI", "AT+NOTP", "AT+NAME", "AT+PCTL", "AT+PARI", "AT+PIO1", "AT+PASS", "AT+PIN", "AT+POWE",
+                                   "AT+MODE", "AT+NOTI", "AT+NOTP", "AT+NAME", "AT+PCTL", "AT+PARI", "AT+PIO1", "AT+PIO", "AT+PASS", "AT+POWE",
                                    "AT+PWRM", "AT+RELI", "AT+RENEW", "AT+RESTART", "AT+ROLE", "AT+RSSI", "AT+RADD", "AT+RAT", "AT+STOP", "AT+START",
                                    "AT+SLEEP", "AT+SAVE", "AT+SENS", "AT+SHOW", "AT+TEHU", "AT+TEMP", "AT+TCON", "AT+TYPE", "AT+UUID", "AT+UART","AT+VERS", "ERROR"};
 
@@ -23,9 +23,9 @@ namespace HM_1X_Aid_v01
         {
             None = 0, CheckStatus, ADC, MACAddress, AdvertizingInterval, AdvertizingType, ANCS, WhiteListSwitch, WhitelistMACAddress, PIOStateAfterPowerOn, PIOStateAfterConnection,
             BatteryMonitor, BatteryInformation, BitFormat, BaudRate, MinLinkLayerInterval, MaxLinkLayerInterval, LinkLayerSlaveLatency, UpdateConnectionParameter, Characteristic,
-            ClearLastConnected, TryLastConnected, TryConnectionAddress, PIOState, PIOCollectionRate, StartDiscovery, StartiBeaconDiscovery, ConnectToDiscoveredDevice, iBeaconMode, RemoveBondInfo,
+            ClearLastConnected, TryLastConnected, TryConnectionAddress, PIOStateByte, PIOCollectionRate, StartDiscovery, StartiBeaconDiscovery, ConnectToDiscoveredDevice, iBeaconMode, RemoveBondInfo,
             AdvertizingFlag, HM1XConnectionFilter, FlowControlSwitch, RXGain, Help, WorkType, iBeaconModeSwitch, iBeaconUUID0, iBeaconUUID1, iBeaconUUID2, iBeaconUUID3,
-            iBeaconMajorVersion, iBeaconMinorVersion, iBeaconMeasuredPower, WorkMode, ConnectionNotification, ConnNotificationMode, Name, OutputDriver, Parity, ConnectionLEDMode, SetPIOTemp, Pin,
+            iBeaconMajorVersion, iBeaconMinorVersion, iBeaconMeasuredPower, WorkMode, ConnectionNotification, ConnNotificationMode, Name, OutputDriver, Parity, ConnectionLEDMode, PIOState, Pin,
             PowerLevel, SleepType, ReliableAdvertizing, Renew, Reset, Role, RSSI, LastConnectedAddress, SensorWorkInterval, StopBits, StartWork, Sleep, SaveConnectedAddress, SensorType,
             DiscoveryParameter, TemperatureSensor, ICTemperature, RemoteDeviceTimeout, BondType, Service, WakeThroughUART, Version, ERROR
         }
@@ -57,7 +57,7 @@ namespace HM_1X_Aid_v01
             "Clear Last Connected",
             "Try Last Connected",
             "Try Connection Address",
-            "Pin IO State",
+            "Pin IO State as Byte",
             "Pin IO Collection Rate",
             "Start Discovery",
             "Start iBeacon Discovery",
@@ -85,8 +85,8 @@ namespace HM_1X_Aid_v01
             "Output Driver",
             "Parity",
             "Connection LED Mode",
-            "Set Pin IO Temp",
-            "Password",
+            "PIO State",
+            "Bonding PIN (password)",
             "Power Level",
             "Sleep Type",
             "Reliable Advertizing",
@@ -389,7 +389,7 @@ namespace HM_1X_Aid_v01
                     settingsExplained.SelectedIndex = 0;
                     break;
                 //"AT+COL",
-                case hm1xConstants.hm1xEnumCommands.PIOState:
+                case hm1xConstants.hm1xEnumCommands.PIOStateByte:
                     atCommandList.Add("??");
                     settingsExplained.Items.Add("Get Pin IO State");
                     settingsExplained.Enabled = true;
@@ -486,9 +486,9 @@ namespace HM_1X_Aid_v01
                     atCommandList.Add("?");
                     settingsExplained.Items.Add("Get RX Gain setting");
                     atCommandList.Add("0");
-                    settingsExplained.Items.Add("Set RX Gain ON");
-                    atCommandList.Add("1");
                     settingsExplained.Items.Add("Set RX Gain OFF");
+                    atCommandList.Add("1");
+                    settingsExplained.Items.Add("Set RX Gain ON");
                     settingsExplained.Enabled = true;
                     settingsExplained.SelectedIndex = 0;
                     break;
@@ -586,7 +586,7 @@ namespace HM_1X_Aid_v01
                     settingsExplained.Enabled = true;
                     settingsExplained.SelectedIndex = 0;
                     break;
-                //"AT+PIO
+                //"AT+PIO1
                 case hm1xConstants.hm1xEnumCommands.ConnectionLEDMode:
                     atCommandList.Add("?");
                     settingsExplained.Items.Add("Get LED Connection Behavior");
@@ -597,8 +597,105 @@ namespace HM_1X_Aid_v01
                     settingsExplained.Enabled = true;
                     settingsExplained.SelectedIndex = 0;
                     break;
+                //"AT+PIO1
+                case hm1xConstants.hm1xEnumCommands.PIOState:
+                    switch (deviceType)
+                    {
+                        case hm1xConstants.hm1xDeviceType.HM10:
+                            atCommandList.Add("2?");
+                            settingsExplained.Items.Add("Get Pin 2 State");
+                            atCommandList.Add("3?");
+                            settingsExplained.Items.Add("Get Pin 3 State");
+                            atCommandList.Add("4?");
+                            settingsExplained.Items.Add("Get Pin 4 State");
+                            atCommandList.Add("5?");
+                            settingsExplained.Items.Add("Get Pin 5 State");
+                            atCommandList.Add("6?");
+                            settingsExplained.Items.Add("Get Pin 6 State");
+                            atCommandList.Add("7?");
+                            settingsExplained.Items.Add("Get Pin 7 State");
+                            atCommandList.Add("8?");
+                            settingsExplained.Items.Add("Get Pin 8 State");
+                            atCommandList.Add("9?");
+                            settingsExplained.Items.Add("Get Pin 9 State");
+                            atCommandList.Add("A?");
+                            settingsExplained.Items.Add("Get Pin A State");
+                            atCommandList.Add("B?");
+                            settingsExplained.Items.Add("Get Pin B State");
+                            atCommandList.Add("20");
+                            settingsExplained.Items.Add("Set Pin 2 LOW");
+                            atCommandList.Add("30");
+                            settingsExplained.Items.Add("Set Pin 3 LOW");
+                            atCommandList.Add("40");
+                            settingsExplained.Items.Add("Set Pin 4 LOW");
+                            atCommandList.Add("50");
+                            settingsExplained.Items.Add("Set Pin 5 LOW");
+                            atCommandList.Add("60");
+                            settingsExplained.Items.Add("Set Pin 6 LOW");
+                            atCommandList.Add("70");
+                            settingsExplained.Items.Add("Set Pin 7 LOW");
+                            atCommandList.Add("80");
+                            settingsExplained.Items.Add("Set Pin 8 LOW");
+                            atCommandList.Add("90");
+                            settingsExplained.Items.Add("Set Pin 9 LOW");
+                            atCommandList.Add("A0");
+                            settingsExplained.Items.Add("Set Pin A LOW");
+                            atCommandList.Add("B0");
+                            settingsExplained.Items.Add("Set Pin B LOW");
+                            atCommandList.Add("21");
+                            settingsExplained.Items.Add("Set Pin 2 HIGH");
+                            atCommandList.Add("31");
+                            settingsExplained.Items.Add("Set Pin 3 HIGH");
+                            atCommandList.Add("41");
+                            settingsExplained.Items.Add("Set Pin 4 HIGH");
+                            atCommandList.Add("51");
+                            settingsExplained.Items.Add("Set Pin 5 HIGH");
+                            atCommandList.Add("61");
+                            settingsExplained.Items.Add("Set Pin 6 HIGH");
+                            atCommandList.Add("71");
+                            settingsExplained.Items.Add("Set Pin 7 HIGH");
+                            atCommandList.Add("81");
+                            settingsExplained.Items.Add("Set Pin 8 HIGH");
+                            atCommandList.Add("91");
+                            settingsExplained.Items.Add("Set Pin 9 HIGH");
+                            atCommandList.Add("A1");
+                            settingsExplained.Items.Add("Set Pin A HIGH");
+                            atCommandList.Add("B1");
+                            settingsExplained.Items.Add("Set Pin B HIGH");
+                            settingsExplained.Enabled = true;
+                            settingsExplained.SelectedIndex = 0;
+                            break;
+                        case hm1xConstants.hm1xDeviceType.HM11:
+                            atCommandList.Add("2?");
+                            settingsExplained.Items.Add("Get Pin 2 State");
+                            atCommandList.Add("3?");
+                            settingsExplained.Items.Add("Get Pin 3 State");
+                            atCommandList.Add("20");
+                            settingsExplained.Items.Add("Set Pin 2 LOW");
+                            atCommandList.Add("30");
+                            settingsExplained.Items.Add("Set Pin 3 LOW");
+                            atCommandList.Add("21");
+                            settingsExplained.Items.Add("Set Pin 2 HIGH");
+                            atCommandList.Add("31");
+                            settingsExplained.Items.Add("Set Pin 3 HIGH");
+                            settingsExplained.Enabled = true;
+                            settingsExplained.SelectedIndex = 0;
+                            break;
+                        case hm1xConstants.hm1xDeviceType.HM15:
+
+                            break;
+
+                    }
+                    break;
                 //"AT+PASS
-                //"AT+PIN
+                case hm1xConstants.hm1xEnumCommands.Pin:
+                    atCommandList.Add("?");
+                    settingsExplained.Items.Add("Get Current PIN (i.e., bonding password)");
+                    atCommandList.Add("");
+                    settingsExplained.Items.Add("Set Current PIN (i.e., bonding password)");
+                    settingsExplained.Enabled = true;
+                    settingsExplained.SelectedIndex = 0;
+                    break;
                 //"AT+POWE
                 //"AT+PWRM
                 //"AT+RELI
@@ -871,7 +968,38 @@ namespace HM_1X_Aid_v01
                         }
                     }
                     break;
+                case hm1xConstants.hm1xEnumCommands.Pin:
+                    if(settingsSelection > 0)
+                    {
+                        // Make sure all four characters are in HEX range.
+                        int pinCharCount = parameterOne.Text.Length;
 
+                        if (pinCharCount > 6)  // If there are more than four characters, trim it.
+                        {
+                            parameterOne.Text = parameterOne.Text.Remove(6, pinCharCount - 6);
+                        }
+                        else if ( pinCharCount < 6 && pinCharCount > 0 )
+                        {
+                            for (int i = 0; i < (6 - pinCharCount); i++)
+                            {
+                                parameterOne.Text += "0";
+                            }
+                        }
+                        else // Else, default to "0"
+                        {
+                            parameterOne.Text = "123456";
+                        }
+
+                        char[] pinCharArray = parameterOne.Text.ToCharArray();
+
+                        for (int i = 0; i < 1; i++)
+                        {
+                            if (pinCharArray[i] > '9') { pinCharArray[i] = '9'; }
+                            else if (pinCharArray[i] < '0') { pinCharArray[i] = '0'; }
+                        }
+                        parameterOne.Text = new string(pinCharArray);
+                    }
+                    break;
             }
         }
 

@@ -647,7 +647,14 @@ namespace HM_1X_Aid_v01
                         txbParameterOne.Visible = true;
                     }
                     break;
-
+                case hm1xConstants.hm1xEnumCommands.Pin:
+                    if(cmbHM1XSettings.SelectedIndex > 0)
+                    {
+                        lblParameterOne.Text = "Pin (Max 6 chars)";
+                        lblParameterOne.Visible = true;
+                        txbParameterOne.Visible = true;
+                    }
+                    break;
             }
         }
     }
