@@ -2104,7 +2104,7 @@ class SerialPortsExtended: SerialPort
                 richTextBox.AppendText("This option should be used if firmware is less than v524.\r\n");
                 break;
             case hm1xConstants.hm1xEnumCommands.WakeThroughUART:
-                richTextBox.AppendText("This option is on available to HMSensor.\r\n");
+                richTextBox.AppendText("This option is on available to HMSensor.\r\n ");
                 break;
         }
         richTextBox.SelectionStart = richTextBox.Text.Length;
