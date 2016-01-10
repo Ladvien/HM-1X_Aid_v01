@@ -434,7 +434,7 @@
             this.tabPortSettings.Controls.Add(this.tloPortSettings);
             this.tabPortSettings.Location = new System.Drawing.Point(4, 29);
             this.tabPortSettings.Name = "tabPortSettings";
-            this.tabPortSettings.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabPortSettings.Padding = new System.Windows.Forms.Padding(3);
             this.tabPortSettings.Size = new System.Drawing.Size(955, 168);
             this.tabPortSettings.TabIndex = 0;
             this.tabPortSettings.Text = "Port Settings";
@@ -624,7 +624,7 @@
             this.tabDataSettings.Controls.Add(this.tableLayoutPanel3);
             this.tabDataSettings.Location = new System.Drawing.Point(4, 29);
             this.tabDataSettings.Name = "tabDataSettings";
-            this.tabDataSettings.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabDataSettings.Padding = new System.Windows.Forms.Padding(3);
             this.tabDataSettings.Size = new System.Drawing.Size(955, 168);
             this.tabDataSettings.TabIndex = 1;
             this.tabDataSettings.Text = "Data Settings";
@@ -741,7 +741,7 @@
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
             this.tableLayoutPanel5.RowCount = 1;
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 170F));
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 168F));
             this.tableLayoutPanel5.Size = new System.Drawing.Size(955, 168);
             this.tableLayoutPanel5.TabIndex = 0;
             // 
@@ -966,7 +966,7 @@
             this.menuPanel.Controls.Add(this.tableLayoutPanel2);
             this.menuPanel.Location = new System.Drawing.Point(12, 49);
             this.menuPanel.Name = "menuPanel";
-            this.menuPanel.Padding = new System.Windows.Forms.Padding(20, 20, 20, 20);
+            this.menuPanel.Padding = new System.Windows.Forms.Padding(20);
             this.menuPanel.Size = new System.Drawing.Size(200, 671);
             this.menuPanel.TabIndex = 3;
             // 

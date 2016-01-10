@@ -7,12 +7,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Reflection;
 
+// Set version here.
+[assembly: AssemblyVersion("1.1.*")]
 
 namespace HM_1X_Aid_v01
 {
+
     public partial class MainDisplay : Form
     {
+
+        string version = System.Reflection.Assembly.GetExecutingAssembly()
+                                           .GetName()
+                                           .Version
+                                           .ToString();
+
         enum displayableDataTypes: int {HEX, Decimal, String};
         enum charsAfterRXTX: int {None = 0, LineFeed, CarriageReturn, CarriageReturnLineFeed, LineFeedCarriageReturn};
         bool toggleSendBoxStringHex = true;
@@ -26,6 +36,7 @@ namespace HM_1X_Aid_v01
 
         private SerialPortsExtended serialPorts = new SerialPortsExtended();
 
+
         public MainDisplay()
         {
             InitializeComponent();
@@ -35,6 +46,9 @@ namespace HM_1X_Aid_v01
         {
             // Prevents the GUI from getting illegible.
             this.MinimumSize = new System.Drawing.Size(800, 600);
+
+            // Form Title
+            this.Text = "HM-1X Aid v" + version;
 
             // Initialize the HM1X dictionary.
             serialPorts.initDictionary();

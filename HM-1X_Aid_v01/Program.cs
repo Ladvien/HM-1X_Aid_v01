@@ -111,6 +111,7 @@ class SerialPortsExtended: SerialPort
         writeTimeout = timeout;
     }
 
+
     public List<string> getPortsList()
     {
         // Updates the COMs port list and returns it.
@@ -134,6 +135,8 @@ class SerialPortsExtended: SerialPort
             ComPort.StopBits = (StopBits)Enum.Parse(typeof(StopBits), stopBits);
             ComPort.Handshake = (Handshake)Enum.Parse(typeof(Handshake), handshaking);
             ComPort.Parity = (Parity)Enum.Parse(typeof(Parity), parity);
+            ComPort.WriteTimeout = SerialPort.InfiniteTimeout;
+            ComPort.ReadTimeout = SerialPort.InfiniteTimeout;
             try
             {
                 ComPort.Open();
@@ -344,21 +347,23 @@ class SerialPortsExtended: SerialPort
     //Write Data
     public void WriteData(string dataToWrite)
     {
-        try
+        if (isPortOpen())
         {
-            if (isPortOpen())
+            try
             {
                 ComPort.Write(dataToWrite);
-                Console.WriteLine("Data Sent: {0}", dataToWrite);
-            } else
+                //Console.WriteLine("Data Sent: {0}", dataToWrite);
+            }
+            catch (TimeoutException ex)
+            {
+                Console.WriteLine(ex.ToString());
+                MessageBox.Show(null, "Device on " + ComPort.PortName + " is not responding...", "Write Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }   
+        } else
             {
                 MessageBox.Show(null, "No open port.", "Port error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
         }
-        catch (UnauthorizedAccessException ex) { MessageBox.Show(ex.Message); }
-
-    }
 
     // Gets are single character from InputData buffer, removing it from the buffer.
     public char getChar()
